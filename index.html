@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Foot Care | Genomma Lab</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #2C3E50; min-height: 100vh; }
+
+/* ── Upload Screen ─────────────────────────────────────── */
+#upload-screen {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 100vh; gap: 24px; padding: 40px;
+}
+.upload-card {
+  background: white; border-radius: 16px; padding: 60px 72px;
+  text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  max-width: 520px; width: 100%; border: 2px dashed #CBD5E1;
+  transition: all 0.2s;
+}
+.upload-card.drag-over { border-color: #1565C0; background: #F0F4FF; }
+.upload-icon { font-size: 64px; margin-bottom: 20px; }
+.upload-card h1 { font-size: 28px; color: #1565C0; margin-bottom: 8px; font-weight: 700; }
+.upload-card p { color: #64748B; margin-bottom: 32px; font-size: 15px; line-height: 1.6; }
+.btn-upload {
+  display: inline-block; background: #1565C0; color: white;
+  padding: 14px 36px; border-radius: 10px; cursor: pointer;
+  font-size: 15px; font-weight: 700; border: none; transition: background 0.2s;
+  text-decoration: none;
+}
+.btn-upload:hover { background: #0D47A1; }
+#file-input { display: none; }
+.file-hint { margin-top: 20px; font-size: 12px; color: #94A3B8; font-style: italic; }
+
+/* ── Header ─────────────────────────────────────────────── */
+#dashboard { display: none; }
+.header {
+  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+  color: white; padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header .sub { font-size: 12px; opacity: 0.75; margin-top: 4px; }
+.header-right { text-align: right; font-size: 12px; opacity: 0.85; line-height: 1.8; }
+
+/* ── KPIs ────────────────────────────────────────────────── */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; padding: 20px 32px 0;
+}
+.kpi-card {
+  background: white; border-radius: 12px; padding: 18px 22px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07); border-left: 4px solid #1565C0;
+}
+.kpi-card.green  { border-left-color: #16A34A; }
+.kpi-card.red    { border-left-color: #DC2626; }
+.kpi-card.orange { border-left-color: #EA580C; }
+.kpi-lbl { font-size: 11px; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+.kpi-val { font-size: 24px; font-weight: 800; color: #1E293B; margin: 6px 0 4px; line-height: 1; }
+.kpi-sub { font-size: 12px; color: #64748B; }
+.kpi-sub.pos { color: #16A34A; font-weight: 600; }
+.kpi-sub.neg { color: #DC2626; font-weight: 600; }
+
+/* ── Controls ────────────────────────────────────────────── */
+.controls {
+  background: white; margin: 18px 32px; border-radius: 12px;
+  padding: 14px 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
+}
+.ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+.ctrl-lbl { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.7px; }
+.pill-group { display: flex; border: 2px solid #1565C0; border-radius: 8px; overflow: hidden; }
+.pill {
+  padding: 7px 16px; border: none; cursor: pointer;
+  font-size: 13px; font-weight: 700; background: white;
+  color: #1565C0; transition: all 0.15s; white-space: nowrap;
+}
+.pill.on { background: #1565C0; color: white; }
+.pill:not(:last-child) { border-right: 1px solid #BFDBFE; }
+.sel {
+  padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px;
+  font-size: 13px; color: #2C3E50; background: white; min-width: 170px;
+  cursor: pointer; font-weight: 600;
+}
+.sel:focus { outline: none; border-color: #1565C0; }
+#month-group { display: none; }
+
+/* ── Charts grid ─────────────────────────────────────────── */
+.section { padding: 0 32px; }
+.grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.card {
+  background: white; border-radius: 12px; padding: 22px 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.card-title { font-size: 14px; font-weight: 800; color: #1E293B; margin-bottom: 2px; }
+.card-sub   { font-size: 11px; color: #94A3B8; margin-bottom: 16px; min-height: 16px; }
+.chart-wrap { position: relative; height: 270px; }
+.chart-wrap-tall { position: relative; height: 310px; }
+
+/* ── Trend ───────────────────────────────────────────────── */
+.trend-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.tbl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+}
+.dim-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.dim-pill {
+  padding: 5px 14px; border: 1px solid #E2E8F0; border-radius: 20px;
+  cursor: pointer; font-size: 12px; font-weight: 700; background: white;
+  color: #64748B; transition: all 0.15s;
+}
+.dim-pill.on { background: #1565C0; color: white; border-color: #1565C0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  background: #F8FAFC; padding: 9px 13px; text-align: right;
+  font-weight: 800; color: #64748B; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border-bottom: 2px solid #E2E8F0;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 9px 13px; text-align: right;
+  border-bottom: 1px solid #F1F5F9; color: #2C3E50;
+}
+.data-table td:first-child { text-align: left; font-weight: 700; }
+.data-table tr:hover td { background: #F8FBFF; }
+.data-table tfoot td {
+  font-weight: 800; background: #F1F5F9;
+  border-top: 2px solid #CBD5E1; border-bottom: none;
+}
+.pos { color: #16A34A; font-weight: 700; }
+.neg { color: #DC2626; font-weight: 700; }
+.bar-cell { display: flex; align-items: center; gap: 8px; }
+.mini-bar { height: 7px; background: #BFDBFE; border-radius: 4px; flex-shrink: 0; }
+.mini-bar-fill { height: 7px; background: #1565C0; border-radius: 4px; }
+
+.mb18 { margin-bottom: 18px; }
+.mb32 { margin-bottom: 32px; }
+
+@media (max-width: 960px) {
+  .grid-2x2 { grid-template-columns: 1fr; }
+  .kpi-row   { grid-template-columns: 1fr 1fr; }
+  .header, .controls, .section { padding-left: 16px; padding-right: 16px; }
+  .controls { margin-left: 16px; margin-right: 16px; }
+  .kpi-row   { padding: 16px 16px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     UPLOAD SCREEN
+═══════════════════════════════════════════════════════════ -->
+<div id="upload-screen">
+  <div class="upload-card" id="drop-zone">
+    <div class="upload-icon">📊</div>
+    <h1>Dashboard Foot Care</h1>
+    <p>Carga el archivo <strong>base maestra.csv</strong> para visualizar el análisis de mercado de la categoría de Pies.</p>
+    <label class="btn-upload" for="file-input">📂 Seleccionar CSV</label>
+    <input type="file" id="file-input" accept=".csv">
+    <p class="file-hint">Share → 2026 → Bases → base maestra.csv<br>También puedes arrastrar y soltar el archivo aquí</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     MAIN DASHBOARD
+═══════════════════════════════════════════════════════════ -->
+<div id="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>🦶 Dashboard Foot Care — Mercado Total Privado</h1>
+      <div class="sub">GP+OTC Genomma Lab · Canal Data · Genomma Canal Data</div>
+    </div>
+    <div class="header-right">
+      <div id="hdr-date">—</div>
+      <div id="hdr-rows" style="opacity:.65"></div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Métrica</div>
+      <div class="pill-group">
+        <button class="pill on" id="pUni"   onclick="setMetric('Uni')">Unidades</button>
+        <button class="pill"    id="pPesos" onclick="setMetric('Pesos')">Pesos $MXN</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Período</div>
+      <div class="pill-group">
+        <button class="pill on" id="pMAT" onclick="setPeriod('MAT')">MAT</button>
+        <button class="pill"    id="pYTD" onclick="setPeriod('YTD')">YTD</button>
+        <button class="pill"    id="pMQT" onclick="setPeriod('MQT')">MQT</button>
+        <button class="pill"    id="pMTH" onclick="setPeriod('MTH')">Mensual</button>
+      </div>
+    </div>
+    <div class="ctrl-group" id="month-group">
+      <div class="ctrl-lbl">Mes</div>
+      <select class="sel" id="month-sel" onchange="setMonth(this.value)"></select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Canal</div>
+      <select class="sel" id="canal-sel" onchange="applyFilter('canal', this.value)">
+        <option value="Todos">Todos los canales</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Segmento</div>
+      <select class="sel" id="seg-sel" onchange="applyFilter('segmento', this.value)">
+        <option value="Todos">Todos los segmentos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 4 Share Charts -->
+  <div class="section">
+    <div class="grid-2x2">
+      <div class="card">
+        <div class="card-title">Share por Canal / Mercado</div>
+        <div class="card-sub" id="sub0">—</div>
+        <div class="chart-wrap"><canvas id="cCanal"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Marca</div>
+        <div class="card-sub" id="sub1">—</div>
+        <div class="chart-wrap"><canvas id="cMarca"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Forma Farmacéutica</div>
+        <div class="card-sub" id="sub2">—</div>
+        <div class="chart-wrap"><canvas id="cForma"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Portafolio / Segmento</div>
+        <div class="card-sub" id="sub3">—</div>
+        <div class="chart-wrap"><canvas id="cSeg"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="card mb18">
+      <div class="trend-header">
+        <div>
+          <div class="card-title">Evolución Mensual — Top Marcas</div>
+          <div class="card-sub">Tendencia Feb 2024 → Ene 2026 · últimos 24 meses disponibles</div>
+        </div>
+        <select class="sel" id="topn-sel" onchange="renderTrend()" style="min-width:140px">
+          <option value="5">Top 5 marcas</option>
+          <option value="8">Top 8 marcas</option>
+          <option value="10">Top 10 marcas</option>
+        </select>
+      </div>
+      <div class="chart-wrap-tall"><canvas id="cTrend"></canvas></div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card mb32">
+      <div class="tbl-header">
+        <div>
+          <div class="card-title">Tabla Comparativa de Mercado</div>
+          <div class="card-sub">Período actual vs. año anterior · Share y variación</div>
+        </div>
+        <div class="dim-pills">
+          <button class="dim-pill on"  onclick="setTblDim('Marca Principal',this)">Marca</button>
+          <button class="dim-pill"     onclick="setTblDim('Canal',this)">Canal</button>
+          <button class="dim-pill"     onclick="setTblDim('Forma',this)">Forma</button>
+          <button class="dim-pill"     onclick="setTblDim('Segmento',this)">Segmento</button>
+          <button class="dim-pill"     onclick="setTblDim('Corporacion',this)">Corporación</button>
+        </div>
+      </div>
+      <div id="tbl-wrap" style="overflow-x:auto"></div>
+    </div>
+
+  </div><!-- /section -->
+</div><!-- /dashboard -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+// PALETTE & CONSTANTS
+// ══════════════════════════════════════════════════════════
+const PAL = [
+  '#1565C0','#DC2626','#EA580C','#16A34A','#7C3AED',
+  '#0891B2','#B45309','#BE185D','#065F46','#1D4ED8',
+  '#9A3412','#6D28D9','#0F766E','#BE123C','#4338CA',
+  '#15803D','#92400E','#1E40AF','#7E22CE','#0E7490',
+];
+
+const ALL_MONTHS = [
+  'Feb. 24','Mar. 24','Abr. 24','May. 24','Jun. 24','Jul. 24',
+  'Ago. 24','Sep. 24','Oct. 24','Nov. 24','Dic. 24',
+  'Ene. 25','Feb. 25','Mar. 25','Abr. 25','May. 25','Jun. 25',
+  'Jul. 25','Ago. 25','Sep. 25','Oct. 25','Nov. 25','Dic. 25','Ene. 26'
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let DATA = [], HEADS = [];
+const ST = {
+  metric:   'Uni',
+  period:   'MAT',
+  month:    'Ene. 26',
+  canal:    'Todos',
+  segmento: 'Todos',
+  tblDim:   'Marca Principal',
+};
+const CHARTS = {};
+
+// ══════════════════════════════════════════════════════════
+// CSV PARSING
+// ══════════════════════════════════════════════════════════
+function parseRow(line) {
+  const r = []; let f = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { q = !q; }
+    else if (c === ',' && !q) { r.push(f); f = ''; }
+    else { f += c; }
+  }
+  r.push(f);
+  return r;
+}
+
+function num(v) {
+  if (!v) return 0;
+  const n = parseFloat(String(v).replace(/,/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function loadFile(file) {
+  const rd = new FileReader();
+  rd.onload = e => {
+    const lines = e.target.result.split(/\r?\n/);
+    // Row index 7 (1-based: row 8) = headers
+    HEADS = parseRow(lines[7]).map(h => h.trim());
+    DATA = [];
+    for (let i = 8; i < lines.length; i++) {
+      const l = lines[i].trim();
+      if (!l) continue;
+      const cols = parseRow(l);
+      const row = {};
+      HEADS.forEach((h, j) => { row[h] = (cols[j] || '').trim(); });
+      DATA.push(row);
+    }
+    initFilters();
+    initMonths();
+    document.getElementById('upload-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('hdr-date').textContent = 'Última actualización: Ene 2026';
+    document.getElementById('hdr-rows').textContent = DATA.length.toLocaleString('es-MX') + ' registros';
+    renderAll();
+  };
+  rd.readAsText(file, 'windows-1252');
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function metricToken(m) {
+  // Uni tiene punto en el CSV: "MAT Uni. Ene. 26"
+  // Pesos NO tiene punto:      "MAT Pesos Ene. 26"
+  return m === 'Uni' ? 'Uni.' : 'Pesos';
+}
+function colAC() {
+  const mt = metricToken(ST.metric);
+  if (ST.period === 'MTH') return 'MTH ' + mt + ' ' + ST.month;
+  return ST.period + ' ' + mt + ' Ene. 26';
+}
+function colYA() {
+  const mt = metricToken(ST.metric);
+  if (ST.period === 'MTH') {
+    const mo = ST.month.slice(0, -3);   // e.g. "Ene. "
+    const yr = parseInt(ST.month.slice(-2)) - 1;
+    return 'MTH ' + mt + ' ' + mo + String(yr).padStart(2,'0');
+  }
+  return ST.period + ' ' + mt + ' Ene. 25';
+}
+function colMTH(metric, month) {
+  return 'MTH ' + metricToken(metric) + ' ' + month;
+}
+
+function filtered() {
+  return DATA.filter(r =>
+    (ST.canal    === 'Todos' || r['Canal']    === ST.canal) &&
+    (ST.segmento === 'Todos' || r['Segmento'] === ST.segmento)
+  );
+}
+
+function agg(data, dim) {
+  const ac = {}, ya = {};
+  const cAC = colAC(), cYA = colYA();
+  data.forEach(r => {
+    const k = r[dim] || 'N/D';
+    ac[k] = (ac[k] || 0) + num(r[cAC]);
+    ya[k] = (ya[k] || 0) + num(r[cYA]);
+  });
+  const sorted = Object.entries(ac)
+    .filter(([,v]) => v > 0)
+    .sort((a,b) => b[1] - a[1]);
+  const grand   = sorted.reduce((s,[,v]) => s+v, 0);
+  const grandYA = Object.values(ya).reduce((s,v) => s+v, 0);
+  return { ac, ya, sorted, grand, grandYA };
+}
+
+function grouped(sorted, grand, thresh = 0.012) {
+  const main = []; let other = 0;
+  sorted.forEach(([k,v]) => {
+    if (v / grand >= thresh) main.push([k,v]);
+    else other += v;
+  });
+  if (other > 0) main.push(['Otros', other]);
+  return main;
+}
+
+function fmt(n, metric) {
+  if (metric === 'Pesos') {
+    if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+    return '$' + n.toFixed(0);
+  }
+  if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n.toFixed(0);
+}
+
+function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(1) + '%'; }
+function pp(n)  { return (n >= 0 ? '+' : '') + n.toFixed(1) + ' pp'; }
+
+function periodLabel() {
+  if (ST.period === 'MTH') return 'MTH ' + ST.month;
+  return ST.period + ' Ene. 2026';
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT FILTERS
+// ══════════════════════════════════════════════════════════
+function initFilters() {
+  const canales  = [...new Set(DATA.map(r => r['Canal']).filter(Boolean))].sort();
+  const segs     = [...new Set(DATA.map(r => r['Segmento']).filter(Boolean))].sort();
+  const cSel = document.getElementById('canal-sel');
+  const sSel = document.getElementById('seg-sel');
+  canales.forEach(c => cSel.add(new Option(c, c)));
+  segs.forEach(s => sSel.add(new Option(s, s)));
+}
+
+function initMonths() {
+  const sel = document.getElementById('month-sel');
+  ALL_MONTHS.forEach(m => sel.add(new Option(m, m)));
+  sel.value = 'Ene. 26';
+}
+
+// ══════════════════════════════════════════════════════════
+// CONTROLS
+// ══════════════════════════════════════════════════════════
+function setMetric(m) {
+  ST.metric = m;
+  document.getElementById('pUni').classList.toggle('on', m === 'Uni');
+  document.getElementById('pPesos').classList.toggle('on', m === 'Pesos');
+  renderAll();
+}
+
+function setPeriod(p) {
+  ST.period = p;
+  ['MAT','YTD','MQT','MTH'].forEach(x =>
+    document.getElementById('p'+x).classList.toggle('on', x === p));
+  document.getElementById('month-group').style.display = p === 'MTH' ? 'flex' : 'none';
+  renderAll();
+}
+
+function setMonth(m) { ST.month = m; renderAll(); }
+
+function applyFilter(type, val) {
+  ST[type] = val;
+  renderAll();
+}
+
+function setTblDim(dim, btn) {
+  ST.tblDim = dim;
+  document.querySelectorAll('.dim-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// KPI CARDS
+// ══════════════════════════════════════════════════════════
+function renderKPIs() {
+  const d = filtered();
+  const cAC = colAC(), cYA = colYA();
+  const tot    = d.reduce((s,r) => s + num(r[cAC]), 0);
+  const totYA  = d.reduce((s,r) => s + num(r[cYA]), 0);
+  const growth = totYA > 0 ? (tot / totYA - 1) * 100 : 0;
+
+  const { sorted, grand } = agg(d, 'Marca Principal');
+  const topBrand = sorted[0]?.[0] ?? '—';
+  const topSh    = grand > 0 && sorted[0] ? (sorted[0][1] / grand * 100) : 0;
+  const nBrands  = sorted.length;
+
+  const kpis = [
+    { lbl: 'Tamaño Mercado · ' + periodLabel(),
+      val: fmt(tot, ST.metric), sub: ST.metric === 'Uni' ? 'Unidades' : 'Pesos MXN',
+      cls: '', subCls: '' },
+    { lbl: 'Año Anterior',
+      val: fmt(totYA, ST.metric), sub: ST.metric === 'Uni' ? 'Unidades' : 'Pesos MXN',
+      cls: '', subCls: '' },
+    { lbl: 'Crecimiento vs YA',
+      val: pct(growth),
+      sub: fmt(Math.abs(tot - totYA), ST.metric) + ' de diferencia',
+      cls: growth >= 0 ? 'green' : 'red',
+      subCls: growth >= 0 ? 'pos' : 'neg' },
+    { lbl: 'Marca Líder · ' + periodLabel(),
+      val: topBrand,
+      sub: topSh.toFixed(1) + '% share · ' + nBrands + ' marcas activas',
+      cls: 'orange', subCls: '' },
+  ];
+
+  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-lbl">${k.lbl}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-sub ${k.subCls}">${k.sub}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// DONUT CHARTS
+// ══════════════════════════════════════════════════════════
+function renderDonut(canvasId, subId, dim) {
+  const d = filtered();
+  const { sorted, grand } = agg(d, dim);
+  const grp    = grouped(sorted, grand);
+  const labels = grp.map(([k]) => k);
+  const vals   = grp.map(([,v]) => v);
+  const total  = vals.reduce((s,v) => s+v, 0);
+  const colors = labels.map((_,i) => PAL[i % PAL.length]);
+
+  document.getElementById(subId).textContent =
+    periodLabel() + ' · ' + (ST.metric === 'Uni' ? 'Unidades' : 'Valores') +
+    ' · Total: ' + fmt(total, ST.metric);
+
+  if (CHARTS[canvasId]) CHARTS[canvasId].destroy();
+
+  CHARTS[canvasId] = new Chart(
+    document.getElementById(canvasId).getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: vals, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            font: { size: 11 }, padding: 10, boxWidth: 13,
+            generateLabels: ch => {
+              const ds = ch.data.datasets[0];
+              return ch.data.labels.map((lbl, i) => ({
+                text: lbl + '  ' + (total > 0 ? (ds.data[i]/total*100).toFixed(1) : '0.0') + '%',
+                fillStyle: ds.backgroundColor[i],
+                strokeStyle: ds.backgroundColor[i],
+                lineWidth: 0, index: i, hidden: false,
+              }));
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const p = total > 0 ? (ctx.raw/total*100).toFixed(1) : '0.0';
+              return '  ' + ctx.label + ': ' + fmt(ctx.raw, ST.metric) + ' (' + p + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// TREND CHART
+// ══════════════════════════════════════════════════════════
+function renderTrend() {
+  const d    = filtered();
+  const topN = parseInt(document.getElementById('topn-sel').value);
+  const { sorted } = agg(d, 'Marca Principal');
+  const topKeys = sorted.slice(0, topN).map(([k]) => k);
+
+  const monthly = {};
+  topKeys.forEach(k => monthly[k] = new Array(ALL_MONTHS.length).fill(0));
+  d.forEach(r => {
+    const k = r['Marca Principal'] || 'N/D';
+    if (!topKeys.includes(k)) return;
+    ALL_MONTHS.forEach((mo, i) => {
+      monthly[k][i] += num(r[colMTH(ST.metric, mo)]);
+    });
+  });
+
+  if (CHARTS['trend']) CHARTS['trend'].destroy();
+
+  CHARTS['trend'] = new Chart(
+    document.getElementById('cTrend').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ALL_MONTHS,
+      datasets: topKeys.map((brand, i) => ({
+        label: brand,
+        data: monthly[brand],
+        borderColor: PAL[i % PAL.length],
+        backgroundColor: PAL[i % PAL.length] + '18',
+        borderWidth: 2.5, pointRadius: 2.5, pointHoverRadius: 6,
+        tension: 0.35, fill: false,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { font:{size:11}, padding:14, usePointStyle:true } },
+        tooltip: {
+          callbacks: { label: ctx => '  ' + ctx.dataset.label + ': ' + fmt(ctx.raw, ST.metric) }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#F1F5F9' }, ticks: { font:{size:10}, maxRotation:45 } },
+        y: {
+          grid: { color: '#F1F5F9' },
+          ticks: { font:{size:11}, callback: v => fmt(v, ST.metric) }
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// DATA TABLE
+// ══════════════════════════════════════════════════════════
+function renderTable() {
+  const d = filtered();
+  const { ac, ya, sorted, grand, grandYA } = agg(d, ST.tblDim);
+  const mLbl = ST.metric === 'Uni' ? 'Uni' : '$MXN';
+  const pShort = ST.period === 'MTH' ? 'MTH ' + ST.month.slice(0,3) : ST.period;
+
+  let html = `
+    <table class="data-table">
+      <thead><tr>
+        <th>${ST.tblDim === 'Marca Principal' ? 'Marca' : ST.tblDim}</th>
+        <th>${pShort} AC<br><small>${mLbl}</small></th>
+        <th>${pShort} YA<br><small>${mLbl}</small></th>
+        <th>Var %</th>
+        <th>Share AC</th>
+        <th>Share YA</th>
+        <th>Δ pp</th>
+      </tr></thead>
+      <tbody>`;
+
+  sorted.forEach(([lbl, vAC]) => {
+    const vYA   = ya[lbl] || 0;
+    const varP  = vYA > 0 ? (vAC/vYA - 1)*100 : (vAC > 0 ? 100 : 0);
+    const shAC  = grand  > 0 ? vAC/grand*100   : 0;
+    const shYA  = grandYA > 0 ? vYA/grandYA*100 : 0;
+    const delta = shAC - shYA;
+    const w     = Math.max(2, Math.round(shAC * 2));
+
+    html += `<tr>
+      <td>
+        <div class="bar-cell">
+          <span>${lbl}</span>
+          <div class="mini-bar" style="width:${w}px">
+            <div class="mini-bar-fill" style="width:100%"></div>
+          </div>
+        </div>
+      </td>
+      <td>${fmt(vAC, ST.metric)}</td>
+      <td>${fmt(vYA, ST.metric)}</td>
+      <td class="${varP >= 0 ? 'pos' : 'neg'}">${pct(varP)}</td>
+      <td><strong>${shAC.toFixed(1)}%</strong></td>
+      <td>${shYA.toFixed(1)}%</td>
+      <td class="${delta >= 0 ? 'pos' : 'neg'}">${pp(delta)}</td>
+    </tr>`;
+  });
+
+  const totalVar = grandYA > 0 ? (grand/grandYA - 1)*100 : 0;
+  html += `</tbody>
+    <tfoot><tr>
+      <td>TOTAL MERCADO</td>
+      <td>${fmt(grand, ST.metric)}</td>
+      <td>${fmt(grandYA, ST.metric)}</td>
+      <td class="${totalVar >= 0 ? 'pos' : 'neg'}">${pct(totalVar)}</td>
+      <td><strong>100.0%</strong></td>
+      <td>100.0%</td>
+      <td>—</td>
+    </tr></tfoot>
+    </table>`;
+
+  document.getElementById('tbl-wrap').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════
+function renderAll() {
+  renderKPIs();
+  renderDonut('cCanal', 'sub0', 'Canal');
+  renderDonut('cMarca', 'sub1', 'Marca Principal');
+  renderDonut('cForma', 'sub2', 'Forma');
+  renderDonut('cSeg',   'sub3', 'Segmento');
+  renderTrend();
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// FILE INPUT EVENTS
+// ══════════════════════════════════════════════════════════
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
+</script>
+</body>
+</html>
