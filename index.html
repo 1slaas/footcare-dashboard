@@ -12,27 +12,118 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
 /* ── Upload Screen ─────────────────────────────────────── */
 #upload-screen {
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; min-height: 100vh; gap: 24px; padding: 40px;
+  min-height: 100vh; padding: 0; background: #0A0F2C;
 }
+.hero {
+  width: 100%; padding: 72px 40px 56px;
+  background: linear-gradient(135deg, #0A0F2C 0%, #1565C0 60%, #0891B2 100%);
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(8,145,178,0.35) 0%, transparent 70%);
+}
+.hero-badge {
+  display: inline-block; background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3); color: #BAE6FD;
+  padding: 6px 18px; border-radius: 20px; font-size: 12px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 28px; position: relative;
+}
+.hero h1 {
+  font-size: 52px; font-weight: 900; color: white;
+  line-height: 1.1; margin-bottom: 16px; position: relative;
+  letter-spacing: -1.5px;
+}
+.hero h1 span { color: #38BDF8; }
+.hero-sub {
+  font-size: 18px; color: rgba(255,255,255,0.75);
+  max-width: 580px; margin: 0 auto 40px; line-height: 1.7;
+  position: relative;
+}
+.hero-tags { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
+.tag {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85); padding: 6px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+}
+
+/* Problem + Objectives */
+.landing-body {
+  width: 100%; max-width: 1100px; margin: 0 auto;
+  padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 56px;
+}
+.section-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #38BDF8; margin-bottom: 12px;
+}
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+}
+.problem-text h2 {
+  font-size: 30px; font-weight: 800; color: white;
+  line-height: 1.25; margin-bottom: 18px;
+}
+.problem-text p {
+  color: rgba(255,255,255,0.6); font-size: 15px; line-height: 1.8;
+}
+.problem-text p strong { color: #38BDF8; }
+.pain-cards { display: flex; flex-direction: column; gap: 12px; }
+.pain-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start;
+}
+.pain-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+.pain-card h4 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+.pain-card p  { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+.objectives-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.obj-title { font-size: 30px; font-weight: 800; color: white; margin-bottom: 28px; line-height: 1.25; }
+.obj-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 24px; transition: all 0.2s;
+}
+.obj-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(56,189,248,0.4); }
+.obj-num {
+  font-size: 28px; font-weight: 900; color: #38BDF8;
+  opacity: 0.6; line-height: 1; margin-bottom: 10px;
+}
+.obj-card h4 { font-size: 14px; font-weight: 800; color: white; margin-bottom: 8px; }
+.obj-card p  { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+
+/* Upload card */
+.upload-wrap {
+  text-align: center;
+}
+.upload-wrap h2 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 10px; }
+.upload-wrap p  { color: rgba(255,255,255,0.55); font-size: 14px; margin-bottom: 28px; }
 .upload-card {
-  background: white; border-radius: 16px; padding: 60px 72px;
-  text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-  max-width: 520px; width: 100%; border: 2px dashed #CBD5E1;
-  transition: all 0.2s;
+  background: rgba(255,255,255,0.06); border-radius: 20px; padding: 48px 56px;
+  text-align: center; box-shadow: 0 0 60px rgba(56,189,248,0.1);
+  max-width: 480px; width: 100%; border: 2px dashed rgba(255,255,255,0.2);
+  transition: all 0.2s; margin: 0 auto;
 }
-.upload-card.drag-over { border-color: #1565C0; background: #F0F4FF; }
-.upload-icon { font-size: 64px; margin-bottom: 20px; }
-.upload-card h1 { font-size: 28px; color: #1565C0; margin-bottom: 8px; font-weight: 700; }
-.upload-card p { color: #64748B; margin-bottom: 32px; font-size: 15px; line-height: 1.6; }
+.upload-card.drag-over { border-color: #38BDF8; background: rgba(56,189,248,0.08); }
+.upload-icon { font-size: 56px; margin-bottom: 20px; }
+.upload-card h3 { font-size: 20px; color: white; margin-bottom: 8px; font-weight: 700; }
+.upload-card p { color: rgba(255,255,255,0.5); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
 .btn-upload {
-  display: inline-block; background: #1565C0; color: white;
-  padding: 14px 36px; border-radius: 10px; cursor: pointer;
-  font-size: 15px; font-weight: 700; border: none; transition: background 0.2s;
-  text-decoration: none;
+  display: inline-block; background: linear-gradient(135deg, #1565C0, #0891B2);
+  color: white; padding: 14px 36px; border-radius: 10px; cursor: pointer;
+  font-size: 15px; font-weight: 700; border: none; transition: opacity 0.2s;
+  text-decoration: none; box-shadow: 0 4px 20px rgba(8,145,178,0.4);
 }
-.btn-upload:hover { background: #0D47A1; }
+.btn-upload:hover { opacity: 0.9; }
 #file-input { display: none; }
-.file-hint { margin-top: 20px; font-size: 12px; color: #94A3B8; font-style: italic; }
+.file-hint { margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.3); font-style: italic; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 34px; }
+  .problem-grid, .objectives-grid { grid-template-columns: 1fr; }
+  .landing-body { padding: 32px 20px 60px; }
+}
 
 /* ── Header ─────────────────────────────────────────────── */
 #dashboard { display: none; }
@@ -157,17 +248,122 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
 <body>
 
 <!-- ════════════════════════════════════════════════════════
-     UPLOAD SCREEN
+     UPLOAD / LANDING SCREEN
 ═══════════════════════════════════════════════════════════ -->
 <div id="upload-screen">
-  <div class="upload-card" id="drop-zone">
-    <div class="upload-icon">📊</div>
-    <h1>Dashboard Foot Care</h1>
-    <p>Carga el archivo <strong>base maestra.csv</strong> para visualizar el análisis de mercado de la categoría de Pies.</p>
-    <label class="btn-upload" for="file-input">📂 Seleccionar CSV</label>
-    <input type="file" id="file-input" accept=".csv">
-    <p class="file-hint">Share → 2026 → Bases → base maestra.csv<br>También puedes arrastrar y soltar el archivo aquí</p>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Genomma Lab · Foot Care Intelligence</div>
+    <h1>El mercado de<br><span>Cuidado de Pies</span><br>en tus manos</h1>
+    <p class="hero-sub">
+      Deja de perder horas en Excel. Visualiza shares, tendencias y crecimiento
+      de la categoría Foot Care en México con un solo clic.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">Share por Canal</span>
+      <span class="tag">Share por Marca</span>
+      <span class="tag">Share por Forma</span>
+      <span class="tag">Share por Portafolio</span>
+      <span class="tag">MAT · YTD · MQT · Mensual</span>
+      <span class="tag">Unidades & Pesos MXN</span>
+    </div>
   </div>
+
+  <!-- Body -->
+  <div class="landing-body">
+
+    <!-- Problema -->
+    <div class="problem-grid">
+      <div class="problem-text">
+        <div class="section-label">El Problema</div>
+        <h2>Los datos existen.<br>El tiempo para analizarlos, no.</h2>
+        <p>
+          Cada mes llegan cientos de filas de datos de auditoría de retail que nadie
+          tiene tiempo de procesar a fondo. Mientras tanto, la competencia actúa rápido,
+          los espacios en anaquel se pierden y las decisiones se toman
+          <strong>sin la información correcta</strong>.
+        </p>
+      </div>
+      <div class="pain-cards">
+        <div class="pain-card">
+          <div class="pain-icon">⏳</div>
+          <div>
+            <h4>Horas perdidas en tablas dinámicas</h4>
+            <p>Cruzar datos de Canal × Marca × Forma manualmente consume días enteros del equipo de marketing.</p>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">📉</div>
+          <div>
+            <h4>Tendencias que se ven demasiado tarde</h4>
+            <p>Sin visualización mensual, los picos de demanda estacionales se detectan cuando ya pasaron.</p>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">🔍</div>
+          <div>
+            <h4>Comparativos YoY imposibles de escalar</h4>
+            <p>Calcular variaciones año contra año por marca y canal requiere fórmulas complejas propensas a errores.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objetivos -->
+    <div>
+      <div class="section-label">Objetivos</div>
+      <div class="obj-title">Lo que este dashboard<br>hace por ti</div>
+      <div class="objectives-grid">
+        <div class="obj-card">
+          <div class="obj-num">01</div>
+          <h4>Democratizar la inteligencia de mercado</h4>
+          <p>Cualquier persona del equipo puede explorar los datos sin necesidad de conocer Excel ni tener formación técnica.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">02</div>
+          <h4>Acelerar la lectura de shares</h4>
+          <p>De horas a segundos: visualiza quién gana y quién pierde participación en Canal, Marca, Forma y Portafolio.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">03</div>
+          <h4>Detectar tendencias estacionales</h4>
+          <p>La evolución mensual de las top marcas revela los picos de demanda para anticipar activaciones en PDV.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">04</div>
+          <h4>Comparar con el año anterior</h4>
+          <p>Cada métrica incluye su variación vs. YA en valor absoluto, porcentaje y puntos de participación.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">05</div>
+          <h4>Apoyo a decisiones de portafolio</h4>
+          <p>Identifica qué segmentos (Pies vs. Uñas), formas y canales concentran el valor del mercado.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">06</div>
+          <h4>Visión Unidades + Pesos MXN</h4>
+          <p>Cambia entre volumen y valor con un clic para entender si el mercado crece por precio, volumen o ambos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload -->
+    <div class="upload-wrap">
+      <div class="section-label">Comenzar</div>
+      <h2>Carga tu archivo y empieza</h2>
+      <p>Solo necesitas el archivo <strong style="color:white">base maestra.csv</strong> generado por Canal Data</p>
+      <div class="upload-card" id="drop-zone">
+        <div class="upload-icon">📂</div>
+        <h3>Selecciona o arrastra tu archivo</h3>
+        <p>base maestra.csv · Share → 2026 → Bases</p>
+        <label class="btn-upload" for="file-input">Cargar base maestra.csv</label>
+        <input type="file" id="file-input" accept=".csv">
+        <p class="file-hint">Tus datos nunca salen de tu navegador</p>
+      </div>
+    </div>
+
+  </div><!-- /landing-body -->
 </div>
 
 <!-- ════════════════════════════════════════════════════════
