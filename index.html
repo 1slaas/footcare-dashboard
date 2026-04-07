@@ -139,7 +139,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
 
 /* ── KPIs ────────────────────────────────────────────────── */
 .kpi-row {
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   gap: 16px; padding: 20px 32px 0;
 }
 .kpi-card {
@@ -236,9 +236,39 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
 .mb18 { margin-bottom: 18px; }
 .mb32 { margin-bottom: 32px; }
 
+/* ── Portfolio Comparison ────────────────────────────────── */
+.portfolio-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 6px;
+}
+.portfolio-brand-hdr {
+  font-size: 13px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.8px; padding: 7px 0 10px;
+  border-bottom: 3px solid; margin-bottom: 12px;
+}
+.portfolio-brand-hdr.silka   { color: #1565C0; border-color: #1565C0; }
+.portfolio-brand-hdr.unesia  { color: #16A34A; border-color: #16A34A; }
+.portfolio-brand-hdr.lakesia { color: #7C3AED; border-color: #7C3AED; }
+.portfolio-brand-hdr.ting    { color: #DC2626; border-color: #DC2626; }
+.portfolio-gli-col { display: flex; flex-direction: column; gap: 28px; }
+.portfolio-ting-col { display: flex; flex-direction: column; }
+
+/* ── GLI vs Ting mini-card ───────────────────────────────── */
+.kpi-card.gli { border-left-color: #7C3AED; }
+.gli-row { display: flex; gap: 10px; margin: 8px 0 6px; align-items: flex-end; }
+.gli-brand-lbl {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 2px;
+}
+.gli-brand-lbl.gli-color  { color: #7C3AED; }
+.gli-brand-lbl.ting-color { color: #0891B2; }
+.gli-val { font-size: 17px; font-weight: 800; color: #1E293B; line-height: 1; }
+.gli-sub { font-size: 10px; font-weight: 600; margin-top: 2px; }
+.gli-vs  { color: #CBD5E1; font-size: 16px; font-weight: 300; padding-bottom: 4px; }
+
 @media (max-width: 960px) {
   .grid-2x2 { grid-template-columns: 1fr; }
   .kpi-row   { grid-template-columns: 1fr 1fr; }
+  .portfolio-grid { grid-template-columns: 1fr; }
   .header, .controls, .section { padding-left: 16px; padding-right: 16px; }
   .controls { margin-left: 16px; margin-right: 16px; }
   .kpi-row   { padding: 16px 16px 0; }
@@ -352,14 +382,14 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
     <div class="upload-wrap">
       <div class="section-label">Comenzar</div>
       <h2>Carga tu archivo y empieza</h2>
-      <p>Solo necesitas el archivo <strong style="color:white">base maestra.csv</strong> generado por Canal Data</p>
+      <p>Sube la <strong style="color:white">consulta Canal Data</strong> mensual sin procesar — el dashboard filtra automáticamente el mercado Foot Care</p>
       <div class="upload-card" id="drop-zone">
         <div class="upload-icon">📂</div>
         <h3>Selecciona o arrastra tu archivo</h3>
-        <p>base maestra.csv · Share → 2026 → Bases</p>
-        <label class="btn-upload" for="file-input">Cargar base maestra.csv</label>
+        <p>consulta genomma canal data · archivo .csv mensual</p>
+        <label class="btn-upload" for="file-input">Cargar consulta Canal Data</label>
         <input type="file" id="file-input" accept=".csv">
-        <p class="file-hint">Tus datos nunca salen de tu navegador</p>
+        <p class="file-hint">Tus datos nunca salen de tu navegador · filtro Foot Care automático</p>
       </div>
     </div>
 
@@ -421,16 +451,28 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
       </select>
     </div>
     <div class="ctrl-group">
-      <div class="ctrl-lbl">Segmento</div>
+      <div class="ctrl-lbl">Corporación</div>
       <select class="sel" id="seg-sel" onchange="applyFilter('segmento', this.value)">
-        <option value="Todos">Todos los segmentos</option>
+        <option value="Todos">Todas las corporaciones</option>
       </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Agrupar GLI</div>
+      <div class="pill-group">
+        <button class="pill" id="pGLI" onclick="toggleGLI()"
+          title="Agrupa Silka + Unesia + Lakesia como TOTAL GLI">TOTAL GLI</button>
+      </div>
     </div>
   </div>
 
-  <!-- 4 Share Charts -->
+  <!-- 4 Share Charts: orden de general a específico -->
   <div class="section">
     <div class="grid-2x2">
+      <div class="card">
+        <div class="card-title">Share por Corporación</div>
+        <div class="card-sub" id="sub3">—</div>
+        <div class="chart-wrap"><canvas id="cSeg"></canvas></div>
+      </div>
       <div class="card">
         <div class="card-title">Share por Canal / Mercado</div>
         <div class="card-sub" id="sub0">—</div>
@@ -445,11 +487,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
         <div class="card-title">Share por Forma Farmacéutica</div>
         <div class="card-sub" id="sub2">—</div>
         <div class="chart-wrap"><canvas id="cForma"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Share por Portafolio / Segmento</div>
-        <div class="card-sub" id="sub3">—</div>
-        <div class="chart-wrap"><canvas id="cSeg"></canvas></div>
       </div>
     </div>
 
@@ -477,14 +514,52 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #
           <div class="card-sub">Período actual vs. año anterior · Share y variación</div>
         </div>
         <div class="dim-pills">
-          <button class="dim-pill on"  onclick="setTblDim('Marca Principal',this)">Marca</button>
+          <button class="dim-pill on"  onclick="setTblDim('Producto',this)">Producto</button>
+          <button class="dim-pill"     onclick="setTblDim('Presentacion',this)">Presentación</button>
           <button class="dim-pill"     onclick="setTblDim('Canal',this)">Canal</button>
-          <button class="dim-pill"     onclick="setTblDim('Forma',this)">Forma</button>
-          <button class="dim-pill"     onclick="setTblDim('Segmento',this)">Segmento</button>
+          <button class="dim-pill"     onclick="setTblDim('Forma Farmaceutica3',this)">Forma Farm.</button>
           <button class="dim-pill"     onclick="setTblDim('Corporacion',this)">Corporación</button>
         </div>
       </div>
       <div id="tbl-wrap" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- Portfolio Comparison -->
+    <div class="card mb32">
+      <div class="tbl-header">
+        <div>
+          <div class="card-title">Comparativo de Portafolio · GLI (Silka + Unesia + Lakesia) vs Ting · por Presentación</div>
+          <div class="card-sub" id="portfolio-sub">Detalle por presentación · período actual vs año anterior</div>
+        </div>
+        <div class="dim-pills" id="port-forma-pills">
+          <button class="dim-pill on"  onclick="setPortForma('Todos',this)">Todas las formas</button>
+          <button class="dim-pill"     onclick="setPortForma('Crema / Gel / Ungüento',this)">Crema / Gel / Ungüento</button>
+          <button class="dim-pill"     onclick="setPortForma('Spray / Aerosol',this)">Spray / Aerosol</button>
+          <button class="dim-pill"     onclick="setPortForma('Polvo / PVO Dermat',this)">Talco / Polvo</button>
+        </div>
+      </div>
+      <div class="portfolio-grid">
+        <!-- Columna GLI: 3 marcas apiladas -->
+        <div class="portfolio-gli-col">
+          <div>
+            <div class="portfolio-brand-hdr silka">Silka</div>
+            <div id="portfolio-silka" style="overflow-x:auto"></div>
+          </div>
+          <div>
+            <div class="portfolio-brand-hdr unesia">Unesia</div>
+            <div id="portfolio-unesia" style="overflow-x:auto"></div>
+          </div>
+          <div>
+            <div class="portfolio-brand-hdr lakesia">Lakesia</div>
+            <div id="portfolio-lakesia" style="overflow-x:auto"></div>
+          </div>
+        </div>
+        <!-- Columna Ting -->
+        <div class="portfolio-ting-col">
+          <div class="portfolio-brand-hdr ting">Ting</div>
+          <div id="portfolio-ting" style="overflow-x:auto"></div>
+        </div>
+      </div>
     </div>
 
   </div><!-- /section -->
@@ -521,8 +596,36 @@ const ST = {
   month:    '',  // se actualiza automáticamente al cargar el CSV
   canal:    'Todos',
   segmento: 'Todos',
-  tblDim:   'Marca Principal',
+  tblDim:    'Producto',  // dimensión para tabla comparativa
+  gli:       false,       // agrupa Silka + Unesia + Lakesia como TOTAL GLI
+  portForma: 'Todos',    // filtro de forma farmacéutica en portafolio
 };
+
+// ══════════════════════════════════════════════════════════
+// TOTAL GLI — agrupación de marcas Genomma Foot Care
+// ══════════════════════════════════════════════════════════
+const BRAND_DIM  = 'Producto'; // columna usada para gráficas de marca
+
+// normalizeMarca agrupa SILKA-MEDIC, UNESIA, LAKESIA como "TOTAL GLI"
+// detecta por nombre de Producto (la consulta Canal Data no tiene Marca Principal)
+function normalizeMarca(k) {
+  if (ST.gli && /SILKA|UNESIA|LAKESIA/i.test(k || '')) return 'TOTAL GLI';
+  return k;
+}
+
+// normalizeForma agrupa formas farmacéuticas similares
+function normalizeForma(k) {
+  if (!k) return k;
+  if (/crema|gel|ung[uü]ento/i.test(k))  return 'Crema / Gel / Ungüento';
+  if (/pvo|polvo/i.test(k))               return 'Polvo / PVO Dermat';
+  if (/spray|aerosol/i.test(k))           return 'Spray / Aerosol';
+  return k;
+}
+function toggleGLI() {
+  ST.gli = !ST.gli;
+  document.getElementById('pGLI').classList.toggle('on', ST.gli);
+  renderAll();
+}
 const CHARTS = {};
 
 // ══════════════════════════════════════════════════════════
@@ -605,12 +708,43 @@ function loadFile(file) {
         HEADS.forEach((h, j) => { row[h] = (cols[j] || '').trim(); });
         DATA.push(row);
       }
-      if (DATA.length === 0) { alert('El archivo no contiene datos. Verifica que sea la base maestra correcta.'); return; }
-      // Limpiar filtros y meses previos antes de re-poblar
+      // Excluir filas de totales/resumen (ej. "Total Conformado")
+      DATA = DATA.filter(r => r['Canal'] && !/total/i.test(r['Canal']));
+      // Filtrar mercado Foot Care: Clase Terapeutica Nivel4 = D01A1 ANTIFUNG DERMAT TOPICOS
+      const claseCol = HEADS.find(h => /clase.*ter/i.test(h) || /terapeutica/i.test(h));
+      if (claseCol) DATA = DATA.filter(r => (r[claseCol] || '').includes('D01A1'));
+      if (DATA.length === 0) { alert('El archivo no contiene registros de Foot Care (D01A1 ANTIFUNG DERMAT TOPICOS).\n\nVerifica que sea la consulta Canal Data de antifúngicos dermatológicos.'); return; }
+
+      // ── Diagnóstico de carga ──────────────────────────────
+      console.group('📊 Dashboard Foot Care — diagnóstico de carga');
+      console.log('Clase Terapéutica Foot Care detectada:', claseCol);
+      console.log('Registros Foot Care cargados:', DATA.length);
+      console.log('Período AC detectado:', PERIOD_AC, '| YA:', PERIOD_YA);
+      console.log('Columna AC (MAT Uni):', 'MAT Uni. ' + PERIOD_AC);
+      const totalMAT_Uni   = DATA.reduce((s,r) => s + num(r['MAT Uni. '   + PERIOD_AC]), 0);
+      const totalMAT_Pesos = DATA.reduce((s,r) => s + num(r['MAT Pesos '  + PERIOD_AC]), 0);
+      console.log('TOTAL MERCADO MAT Uni.:', totalMAT_Uni.toLocaleString('es-MX'));
+      console.log('TOTAL MERCADO MAT Pesos $:', totalMAT_Pesos.toLocaleString('es-MX', {style:'currency', currency:'MXN'}));
+      const marcas = [...new Set(DATA.map(r => r['Producto']))].filter(Boolean).sort();
+      console.log('Productos Foot Care detectados (' + marcas.length + '):', marcas);
+      console.log('Meses MTH disponibles:', CSV_MONTHS);
+      console.groupEnd();
+      // ─────────────────────────────────────────────────────
+      // Resetear estado de filtros al cargar nuevo archivo
+      ST.canal     = 'Todos';
+      ST.segmento  = 'Todos';
+      ST.gli       = false;
+      ST.portForma = 'Todos';
+      document.getElementById('pGLI').classList.remove('on');
+      document.querySelectorAll('#port-forma-pills .dim-pill').forEach((b,i) => b.classList.toggle('on', i===0));
+
+      // Limpiar y re-poblar selects
       const cSel = document.getElementById('canal-sel');
       const sSel = document.getElementById('seg-sel');
       while (cSel.options.length > 1) cSel.remove(1);
       while (sSel.options.length > 1) sSel.remove(1);
+      cSel.value = 'Todos';
+      sSel.value = 'Todos';
       document.getElementById('month-sel').innerHTML = '';
       initFilters();
       initMonths();
@@ -619,7 +753,7 @@ function loadFile(file) {
       // Mostrar período detectado dinámicamente
       const perDisplay = PERIOD_AC.replace(/(\d{2})$/, '20$1'); // "Ene. 26" → "Ene. 2026"
       document.getElementById('hdr-date').textContent = 'Última actualización: ' + perDisplay;
-      document.getElementById('hdr-rows').textContent = DATA.length.toLocaleString('es-MX') + ' registros';
+      document.getElementById('hdr-rows').textContent = DATA.length.toLocaleString('es-MX') + ' registros Foot Care';
       renderAll();
     } catch(err) {
       alert('Error al procesar el archivo: ' + err.message + '\n\nVerifica que sea la base maestra generada por Canal Data.');
@@ -656,8 +790,8 @@ function colMTH(metric, month) {
 
 function filtered() {
   return DATA.filter(r =>
-    (ST.canal    === 'Todos' || r['Canal']    === ST.canal) &&
-    (ST.segmento === 'Todos' || r['Segmento'] === ST.segmento)
+    (ST.canal    === 'Todos' || r['Canal']       === ST.canal) &&
+    (ST.segmento === 'Todos' || r['Corporacion'] === ST.segmento)
   );
 }
 
@@ -665,7 +799,10 @@ function agg(data, dim) {
   const ac = {}, ya = {};
   const cAC = colAC(), cYA = colYA();
   data.forEach(r => {
-    const k = r[dim] || 'N/D';
+    let k = r[dim];
+    if (!k) return;
+    if (dim === BRAND_DIM)          k = normalizeMarca(k);
+    if (dim === 'Forma Farmaceutica3') k = normalizeForma(k);
     ac[k] = (ac[k] || 0) + num(r[cAC]);
     ya[k] = (ya[k] || 0) + num(r[cYA]);
   });
@@ -712,12 +849,12 @@ function periodLabel() {
 // INIT FILTERS
 // ══════════════════════════════════════════════════════════
 function initFilters() {
-  const canales  = [...new Set(DATA.map(r => r['Canal']).filter(Boolean))].sort();
-  const segs     = [...new Set(DATA.map(r => r['Segmento']).filter(Boolean))].sort();
+  const canales = [...new Set(DATA.map(r => r['Canal']).filter(Boolean))].sort();
+  const corps   = [...new Set(DATA.map(r => r['Corporacion']).filter(Boolean))].sort();
   const cSel = document.getElementById('canal-sel');
   const sSel = document.getElementById('seg-sel');
   canales.forEach(c => cSel.add(new Option(c, c)));
-  segs.forEach(s => sSel.add(new Option(s, s)));
+  corps.forEach(s => sSel.add(new Option(s, s)));
 }
 
 function initMonths() {
@@ -758,6 +895,13 @@ function applyFilter(type, val) {
   renderAll();
 }
 
+function setPortForma(val, btn) {
+  ST.portForma = val;
+  document.querySelectorAll('#port-forma-pills .dim-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPortfolio();
+}
+
 function setTblDim(dim, btn) {
   ST.tblDim = dim;
   document.querySelectorAll('.dim-pill').forEach(b => b.classList.remove('on'));
@@ -775,10 +919,23 @@ function renderKPIs() {
   const totYA  = d.reduce((s,r) => s + num(r[cYA]), 0);
   const growth = totYA > 0 ? (tot / totYA - 1) * 100 : 0;
 
-  const { sorted, grand } = agg(d, 'Marca Principal');
+  const { sorted, grand } = agg(d, BRAND_DIM);
   const topBrand = sorted[0]?.[0] ?? '—';
   const topSh    = grand > 0 && sorted[0] ? (sorted[0][1] / grand * 100) : 0;
   const nBrands  = sorted.length;
+
+  // GLI vs Ting (siempre calcula sin importar ST.gli)
+  const gliRows  = d.filter(r => /SILKA|UNESIA|LAKESIA/i.test(r['Producto'] || ''));
+  const tingRows = d.filter(r => /^TING/i.test(r['Producto'] || ''));
+  const gliAC  = gliRows.reduce((s,r)  => s + num(r[cAC]), 0);
+  const gliYA  = gliRows.reduce((s,r)  => s + num(r[cYA]), 0);
+  const tingAC = tingRows.reduce((s,r) => s + num(r[cAC]), 0);
+  const tingYA = tingRows.reduce((s,r) => s + num(r[cYA]), 0);
+  const gliSh  = tot > 0 ? gliAC  / tot * 100 : 0;
+  const tingSh = tot > 0 ? tingAC / tot * 100 : 0;
+  const gliGr  = gliYA  > 0 ? (gliAC  / gliYA  - 1) * 100 : 0;
+  const tingGr = tingYA > 0 ? (tingAC / tingYA - 1) * 100 : 0;
+  const delta  = gliSh - tingSh;
 
   const kpis = [
     { lbl: 'Tamaño Mercado · ' + periodLabel(),
@@ -798,12 +955,34 @@ function renderKPIs() {
       cls: 'orange', subCls: '' },
   ];
 
-  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+  const gliCard = `
+    <div class="kpi-card gli">
+      <div class="kpi-lbl">TOTAL GLI vs TING · ${periodLabel()}</div>
+      <div class="gli-row">
+        <div>
+          <div class="gli-brand-lbl gli-color">TOTAL GLI</div>
+          <div class="gli-val">${fmt(gliAC, ST.metric)}</div>
+          <div class="gli-sub ${gliGr >= 0 ? 'pos' : 'neg'}">${pct(gliGr)} · ${gliSh.toFixed(1)}% sh</div>
+        </div>
+        <div class="gli-vs">vs</div>
+        <div>
+          <div class="gli-brand-lbl ting-color">Ting</div>
+          <div class="gli-val">${fmt(tingAC, ST.metric)}</div>
+          <div class="gli-sub ${tingGr >= 0 ? 'pos' : 'neg'}">${pct(tingGr)} · ${tingSh.toFixed(1)}% sh</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#64748B;border-top:1px solid #F1F5F9;padding-top:6px;margin-top:2px">
+        Ventaja GLI: <span style="font-weight:800;color:${delta >= 0 ? '#7C3AED' : '#DC2626'}">${delta >= 0 ? '+' : ''}${delta.toFixed(1)} pp</span>
+      </div>
+    </div>`;
+
+  document.getElementById('kpi-row').innerHTML =
+    kpis.map(k => `
     <div class="kpi-card ${k.cls}">
       <div class="kpi-lbl">${k.lbl}</div>
       <div class="kpi-val">${k.val}</div>
       <div class="kpi-sub ${k.subCls}">${k.sub}</div>
-    </div>`).join('');
+    </div>`).join('') + gliCard;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -868,7 +1047,7 @@ function renderDonut(canvasId, subId, dim) {
 function renderTrend() {
   const d    = filtered();
   const topN = parseInt(document.getElementById('topn-sel').value);
-  const { sorted } = agg(d, 'Marca Principal');
+  const { sorted } = agg(d, BRAND_DIM);
   const topKeys = sorted.slice(0, topN).map(([k]) => k);
 
   // Usar meses del CSV; si no están disponibles aún, usar el fallback estático
@@ -886,7 +1065,9 @@ function renderTrend() {
   const monthly = {};
   topKeys.forEach(k => monthly[k] = new Array(months.length).fill(0));
   d.forEach(r => {
-    const k = r['Marca Principal'] || 'N/D';
+    const rawK = r[BRAND_DIM];
+    if (!rawK) return;
+    const k = normalizeMarca(rawK);
     if (!topKeys.includes(k)) return;
     months.forEach((mo, i) => {
       monthly[k][i] += num(r[colMTH(ST.metric, mo)]);
@@ -941,7 +1122,12 @@ function renderTable() {
   let html = `
     <table class="data-table">
       <thead><tr>
-        <th>${ST.tblDim === 'Marca Principal' ? 'Marca' : ST.tblDim}</th>
+        <th>${
+          ST.tblDim === 'Producto'           ? 'Producto' :
+          ST.tblDim === 'Presentacion'       ? 'Presentación' :
+          ST.tblDim === 'Forma Farmaceutica3'? 'Forma Farm.' :
+          ST.tblDim
+        }</th>
         <th>${pShort} AC<br><small>${mLbl}</small></th>
         <th>${pShort} YA<br><small>${mLbl}</small></th>
         <th>Var %</th>
@@ -994,16 +1180,96 @@ function renderTable() {
 }
 
 // ══════════════════════════════════════════════════════════
+// PORTFOLIO COMPARISON · GLI (Silka + Unesia + Lakesia) vs Ting
+// ══════════════════════════════════════════════════════════
+function renderPortfolio() {
+  // El portafolio solo respeta el filtro de Canal (Silka y Ting son marcas de Pies)
+  // Ignora el filtro de Corporación para mostrar siempre el portafolio completo de GLI vs Ting
+  const dPortfolio = DATA.filter(r =>
+    (ST.canal     === 'Todos' || r['Canal'] === ST.canal) &&
+    (ST.portForma === 'Todos' || normalizeForma(r['Forma Farmaceutica3']) === ST.portForma)
+  );
+  const cAC = colAC(), cYA = colYA();
+  const mLbl   = ST.metric === 'Uni' ? 'Uni' : '$MXN';
+  const pShort = ST.period === 'MTH' ? 'MTH ' + ST.month.slice(0,3) : ST.period;
+
+  function brandTable(brand, pattern) {
+    const rows = dPortfolio.filter(r => pattern.test(r['Producto'] || ''));
+    const ac = {}, ya = {};
+    rows.forEach(r => {
+      const k = r['Presentacion'];
+      if (!k) return;
+      ac[k] = (ac[k] || 0) + num(r[cAC]);
+      ya[k] = (ya[k] || 0) + num(r[cYA]);
+    });
+    const sorted = Object.entries(ac).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+    const grand   = sorted.reduce((s,[,v]) => s+v, 0);
+    const grandYA = Object.values(ya).reduce((s,v) => s+v, 0);
+
+    if (sorted.length === 0)
+      return '<p style="color:#94A3B8;font-size:13px;padding:12px 0">Sin datos para el período y filtros seleccionados</p>';
+
+    let html = `<table class="data-table">
+      <thead><tr>
+        <th>Presentación</th>
+        <th>${pShort} AC<br><small>${mLbl}</small></th>
+        <th>${pShort} YA<br><small>${mLbl}</small></th>
+        <th>Var %</th>
+        <th>Share</th>
+      </tr></thead><tbody>`;
+
+    sorted.forEach(([lbl, vAC]) => {
+      const vYA  = ya[lbl] || 0;
+      const varP = vYA > 0 ? (vAC/vYA - 1)*100 : (vAC > 0 ? 100 : 0);
+      const sh   = grand > 0 ? vAC/grand*100 : 0;
+      const w    = Math.max(2, Math.round(sh * 1.5));
+      html += `<tr>
+        <td style="max-width:220px;white-space:normal;line-height:1.35;font-size:12px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span>${lbl}</span>
+            <div class="mini-bar" style="width:${w}px"><div class="mini-bar-fill" style="width:100%"></div></div>
+          </div>
+        </td>
+        <td>${fmt(vAC, ST.metric)}</td>
+        <td>${fmt(vYA, ST.metric)}</td>
+        <td class="${varP >= 0 ? 'pos' : 'neg'}">${pct(varP)}</td>
+        <td><strong>${sh.toFixed(1)}%</strong></td>
+      </tr>`;
+    });
+
+    const varT = grandYA > 0 ? (grand/grandYA - 1)*100 : 0;
+    html += `</tbody><tfoot><tr>
+      <td>TOTAL ${brand.toUpperCase()}</td>
+      <td>${fmt(grand, ST.metric)}</td>
+      <td>${fmt(grandYA, ST.metric)}</td>
+      <td class="${varT >= 0 ? 'pos' : 'neg'}">${pct(varT)}</td>
+      <td><strong>100%</strong></td>
+    </tr></tfoot></table>`;
+    return html;
+  }
+
+  document.getElementById('portfolio-silka').innerHTML   = brandTable('Silka',   /SILKA/i);
+  document.getElementById('portfolio-unesia').innerHTML  = brandTable('Unesia',  /UNESIA/i);
+  document.getElementById('portfolio-lakesia').innerHTML = brandTable('Lakesia', /LAKESIA/i);
+  document.getElementById('portfolio-ting').innerHTML    = brandTable('Ting',    /^TING/i);
+  const canalLabel = ST.canal === 'Todos' ? 'todos los canales' : ST.canal;
+  document.getElementById('portfolio-sub').textContent =
+    periodLabel() + ' · ' + (ST.metric === 'Uni' ? 'Unidades' : 'Valores') +
+    ' · por presentación · ' + canalLabel;
+}
+
+// ══════════════════════════════════════════════════════════
 // RENDER ALL
 // ══════════════════════════════════════════════════════════
 function renderAll() {
   renderKPIs();
   renderDonut('cCanal', 'sub0', 'Canal');
-  renderDonut('cMarca', 'sub1', 'Marca Principal');
-  renderDonut('cForma', 'sub2', 'Forma');
-  renderDonut('cSeg',   'sub3', 'Segmento');
+  renderDonut('cMarca', 'sub1', BRAND_DIM);
+  renderDonut('cForma', 'sub2', 'Forma Farmaceutica3');
+  renderDonut('cSeg',   'sub3', 'Corporacion');
   renderTrend();
   renderTable();
+  renderPortfolio();
 }
 
 // ══════════════════════════════════════════════════════════
