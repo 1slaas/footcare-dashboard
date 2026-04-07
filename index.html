@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Foot Care | Genomma Lab</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #EEF2F7; color: #2C3E50; min-height: 100vh; }
+
+/* ── Upload Screen ─────────────────────────────────────── */
+#upload-screen {
+  display: flex; flex-direction: column; align-items: center;
+  min-height: 100vh; padding: 0; background: #0A0F2C;
+}
+.hero {
+  width: 100%; padding: 72px 40px 56px;
+  background: linear-gradient(135deg, #0A0F2C 0%, #1565C0 60%, #0891B2 100%);
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(8,145,178,0.35) 0%, transparent 70%);
+}
+.hero-badge {
+  display: inline-block; background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3); color: #BAE6FD;
+  padding: 6px 18px; border-radius: 20px; font-size: 12px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 28px; position: relative;
+}
+.hero h1 {
+  font-size: 52px; font-weight: 900; color: white;
+  line-height: 1.1; margin-bottom: 16px; position: relative;
+  letter-spacing: -1.5px;
+}
+.hero h1 span { color: #38BDF8; }
+.hero-sub {
+  font-size: 18px; color: rgba(255,255,255,0.75);
+  max-width: 580px; margin: 0 auto 40px; line-height: 1.7;
+  position: relative;
+}
+.hero-tags { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
+.tag {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85); padding: 6px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+}
+
+/* Problem + Objectives */
+.landing-body {
+  width: 100%; max-width: 1100px; margin: 0 auto;
+  padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 56px;
+}
+.section-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #38BDF8; margin-bottom: 12px;
+}
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+}
+.problem-text h2 {
+  font-size: 30px; font-weight: 800; color: white;
+  line-height: 1.25; margin-bottom: 18px;
+}
+.problem-text p {
+  color: rgba(255,255,255,0.6); font-size: 15px; line-height: 1.8;
+}
+.problem-text p strong { color: #38BDF8; }
+.pain-cards { display: flex; flex-direction: column; gap: 12px; }
+.pain-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start;
+}
+.pain-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+.pain-card h4 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+.pain-card p  { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+.objectives-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.obj-title { font-size: 30px; font-weight: 800; color: white; margin-bottom: 28px; line-height: 1.25; }
+.obj-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 24px; transition: all 0.2s;
+}
+.obj-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(56,189,248,0.4); }
+.obj-num {
+  font-size: 28px; font-weight: 900; color: #38BDF8;
+  opacity: 0.6; line-height: 1; margin-bottom: 10px;
+}
+.obj-card h4 { font-size: 14px; font-weight: 800; color: white; margin-bottom: 8px; }
+.obj-card p  { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+
+/* Upload card */
+.upload-wrap {
+  text-align: center;
+}
+.upload-wrap h2 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 10px; }
+.upload-wrap p  { color: rgba(255,255,255,0.55); font-size: 14px; margin-bottom: 28px; }
+.upload-card {
+  background: rgba(255,255,255,0.06); border-radius: 20px; padding: 48px 56px;
+  text-align: center; box-shadow: 0 0 60px rgba(56,189,248,0.1);
+  max-width: 480px; width: 100%; border: 2px dashed rgba(255,255,255,0.2);
+  transition: all 0.2s; margin: 0 auto;
+}
+.upload-card.drag-over { border-color: #38BDF8; background: rgba(56,189,248,0.08); }
+.upload-icon { font-size: 56px; margin-bottom: 20px; }
+.upload-card h3 { font-size: 20px; color: white; margin-bottom: 8px; font-weight: 700; }
+.upload-card p { color: rgba(255,255,255,0.5); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
+.btn-upload {
+  display: inline-block; background: linear-gradient(135deg, #1565C0, #0891B2);
+  color: white; padding: 14px 36px; border-radius: 10px; cursor: pointer;
+  font-size: 15px; font-weight: 700; border: none; transition: opacity 0.2s;
+  text-decoration: none; box-shadow: 0 4px 20px rgba(8,145,178,0.4);
+}
+.btn-upload:hover { opacity: 0.9; }
+#file-input { display: none; }
+.file-hint { margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.3); font-style: italic; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 34px; }
+  .problem-grid, .objectives-grid { grid-template-columns: 1fr; }
+  .landing-body { padding: 32px 20px 60px; }
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+#dashboard { display: none; }
+.header {
+  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+  color: white; padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header .sub { font-size: 12px; opacity: 0.75; margin-top: 4px; }
+.header-right { text-align: right; font-size: 12px; opacity: 0.85; line-height: 1.8; }
+
+/* ── KPIs ────────────────────────────────────────────────── */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 16px; padding: 20px 32px 0;
+}
+.kpi-card {
+  background: white; border-radius: 12px; padding: 18px 22px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07); border-left: 4px solid #1565C0;
+}
+.kpi-card.green  { border-left-color: #16A34A; }
+.kpi-card.red    { border-left-color: #DC2626; }
+.kpi-card.orange { border-left-color: #EA580C; }
+.kpi-lbl { font-size: 11px; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+.kpi-val { font-size: 24px; font-weight: 800; color: #1E293B; margin: 6px 0 4px; line-height: 1; }
+.kpi-sub { font-size: 12px; color: #64748B; }
+.kpi-sub.pos { color: #16A34A; font-weight: 600; }
+.kpi-sub.neg { color: #DC2626; font-weight: 600; }
+
+/* ── Controls ────────────────────────────────────────────── */
+.controls {
+  background: white; margin: 18px 32px; border-radius: 12px;
+  padding: 14px 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
+}
+.ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+.ctrl-lbl { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.7px; }
+.pill-group { display: flex; border: 2px solid #1565C0; border-radius: 8px; overflow: hidden; }
+.pill {
+  padding: 7px 16px; border: none; cursor: pointer;
+  font-size: 13px; font-weight: 700; background: white;
+  color: #1565C0; transition: all 0.15s; white-space: nowrap;
+}
+.pill.on { background: #1565C0; color: white; }
+.pill:not(:last-child) { border-right: 1px solid #BFDBFE; }
+.sel {
+  padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px;
+  font-size: 13px; color: #2C3E50; background: white; min-width: 170px;
+  cursor: pointer; font-weight: 600;
+}
+.sel:focus { outline: none; border-color: #1565C0; }
+#month-group { display: none; }
+
+/* ── Charts grid ─────────────────────────────────────────── */
+.section { padding: 0 32px; }
+.grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.card {
+  background: white; border-radius: 12px; padding: 22px 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.card-title { font-size: 14px; font-weight: 800; color: #1E293B; margin-bottom: 2px; }
+.card-sub   { font-size: 11px; color: #94A3B8; margin-bottom: 16px; min-height: 16px; }
+.chart-wrap { position: relative; height: 270px; }
+.chart-wrap-tall { position: relative; height: 310px; }
+
+/* ── Trend ───────────────────────────────────────────────── */
+.trend-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.tbl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+}
+.dim-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.dim-pill {
+  padding: 5px 14px; border: 1px solid #E2E8F0; border-radius: 20px;
+  cursor: pointer; font-size: 12px; font-weight: 700; background: white;
+  color: #64748B; transition: all 0.15s;
+}
+.dim-pill.on { background: #1565C0; color: white; border-color: #1565C0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  background: #F8FAFC; padding: 9px 13px; text-align: right;
+  font-weight: 800; color: #64748B; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border-bottom: 2px solid #E2E8F0;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 9px 13px; text-align: right;
+  border-bottom: 1px solid #F1F5F9; color: #2C3E50;
+}
+.data-table td:first-child { text-align: left; font-weight: 700; }
+.data-table tr:hover td { background: #F8FBFF; }
+.data-table tfoot td {
+  font-weight: 800; background: #F1F5F9;
+  border-top: 2px solid #CBD5E1; border-bottom: none;
+}
+.pos { color: #16A34A; font-weight: 700; }
+.neg { color: #DC2626; font-weight: 700; }
+.bar-cell { display: flex; align-items: center; gap: 8px; }
+.mini-bar { height: 7px; background: #BFDBFE; border-radius: 4px; flex-shrink: 0; }
+.mini-bar-fill { height: 7px; background: #1565C0; border-radius: 4px; }
+
+.mb18 { margin-bottom: 18px; }
+.mb32 { margin-bottom: 32px; }
+
+/* ── Portfolio Comparison ────────────────────────────────── */
+.portfolio-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 6px;
+}
+.portfolio-brand-hdr {
+  font-size: 13px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.8px; padding: 7px 0 10px;
+  border-bottom: 3px solid; margin-bottom: 12px;
+}
+.portfolio-brand-hdr.silka   { color: #1565C0; border-color: #1565C0; }
+.portfolio-brand-hdr.unesia  { color: #16A34A; border-color: #16A34A; }
+.portfolio-brand-hdr.lakesia { color: #7C3AED; border-color: #7C3AED; }
+.portfolio-brand-hdr.ting    { color: #DC2626; border-color: #DC2626; }
+.portfolio-gli-col { display: flex; flex-direction: column; gap: 28px; }
+.portfolio-ting-col { display: flex; flex-direction: column; }
+
+/* ── GLI vs Ting mini-card ───────────────────────────────── */
+.kpi-card.gli { border-left-color: #7C3AED; }
+.gli-row { display: flex; gap: 10px; margin: 8px 0 6px; align-items: flex-end; }
+.gli-brand-lbl {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 2px;
+}
+.gli-brand-lbl.gli-color  { color: #7C3AED; }
+.gli-brand-lbl.ting-color { color: #0891B2; }
+.gli-val { font-size: 17px; font-weight: 800; color: #1E293B; line-height: 1; }
+.gli-sub { font-size: 10px; font-weight: 600; margin-top: 2px; }
+.gli-vs  { color: #CBD5E1; font-size: 16px; font-weight: 300; padding-bottom: 4px; }
+
+@media (max-width: 960px) {
+  .grid-2x2 { grid-template-columns: 1fr; }
+  .kpi-row   { grid-template-columns: 1fr 1fr; }
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .header, .controls, .section { padding-left: 16px; padding-right: 16px; }
+  .controls { margin-left: 16px; margin-right: 16px; }
+  .kpi-row   { padding: 16px 16px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     UPLOAD / LANDING SCREEN
+═══════════════════════════════════════════════════════════ -->
+<div id="upload-screen">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Genomma Lab · Foot Care Intelligence</div>
+    <h1>El mercado de<br><span>Cuidado de Pies</span><br>en tus manos</h1>
+    <p class="hero-sub">
+      Deja de perder horas en Excel. Visualiza shares, tendencias y crecimiento
+      de la categoría Foot Care en México con un solo clic.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">Share por Canal</span>
+      <span class="tag">Share por Marca</span>
+      <span class="tag">Share por Forma</span>
+      <span class="tag">Share por Portafolio</span>
+      <span class="tag">MAT · YTD · MQT · Mensual</span>
+      <span class="tag">Unidades & Pesos MXN</span>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="landing-body">
+
+    <!-- Problema -->
+    <div class="problem-grid">
+      <div class="problem-text">
+        <div class="section-label">El Problema</div>
+        <h2>Los datos existen.<br>El tiempo para analizarlos, no.</h2>
+        <p>
+          Cada mes llegan cientos de filas de datos de auditoría de retail que nadie
+          tiene tiempo de procesar a fondo. Mientras tanto, la competencia actúa rápido,
+          los espacios en anaquel se pierden y las decisiones se toman
+          <strong>sin la información correcta</strong>.
+        </p>
+      </div>
+      <div class="pain-cards">
+        <div class="pain-card">
+          <div class="pain-icon">⏳</div>
+          <div>
+            <h4>Horas perdidas en tablas dinámicas</h4>
+            <p>Cruzar datos de Canal × Marca × Forma manualmente consume días enteros del equipo de marketing.</p>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">📉</div>
+          <div>
+            <h4>Tendencias que se ven demasiado tarde</h4>
+            <p>Sin visualización mensual, los picos de demanda estacionales se detectan cuando ya pasaron.</p>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">🔍</div>
+          <div>
+            <h4>Comparativos YoY imposibles de escalar</h4>
+            <p>Calcular variaciones año contra año por marca y canal requiere fórmulas complejas propensas a errores.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objetivos -->
+    <div>
+      <div class="section-label">Objetivos</div>
+      <div class="obj-title">Lo que este dashboard<br>hace por ti</div>
+      <div class="objectives-grid">
+        <div class="obj-card">
+          <div class="obj-num">01</div>
+          <h4>Democratizar la inteligencia de mercado</h4>
+          <p>Cualquier persona del equipo puede explorar los datos sin necesidad de conocer Excel ni tener formación técnica.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">02</div>
+          <h4>Acelerar la lectura de shares</h4>
+          <p>De horas a segundos: visualiza quién gana y quién pierde participación en Canal, Marca, Forma y Portafolio.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">03</div>
+          <h4>Detectar tendencias estacionales</h4>
+          <p>La evolución mensual de las top marcas revela los picos de demanda para anticipar activaciones en PDV.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">04</div>
+          <h4>Comparar con el año anterior</h4>
+          <p>Cada métrica incluye su variación vs. YA en valor absoluto, porcentaje y puntos de participación.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">05</div>
+          <h4>Apoyo a decisiones de portafolio</h4>
+          <p>Identifica qué segmentos (Pies vs. Uñas), formas y canales concentran el valor del mercado.</p>
+        </div>
+        <div class="obj-card">
+          <div class="obj-num">06</div>
+          <h4>Visión Unidades + Pesos MXN</h4>
+          <p>Cambia entre volumen y valor con un clic para entender si el mercado crece por precio, volumen o ambos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload -->
+    <div class="upload-wrap">
+      <div class="section-label">Comenzar</div>
+      <h2>Carga tu archivo y empieza</h2>
+      <p>Sube la <strong style="color:white">consulta Canal Data</strong> mensual sin procesar — el dashboard filtra automáticamente el mercado Foot Care</p>
+      <div class="upload-card" id="drop-zone">
+        <div class="upload-icon">📂</div>
+        <h3>Selecciona o arrastra tu archivo</h3>
+        <p>consulta genomma canal data · archivo .csv mensual</p>
+        <label class="btn-upload" for="file-input">Cargar consulta Canal Data</label>
+        <input type="file" id="file-input" accept=".csv">
+        <p class="file-hint">Tus datos nunca salen de tu navegador · filtro Foot Care automático</p>
+      </div>
+    </div>
+
+  </div><!-- /landing-body -->
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     MAIN DASHBOARD
+═══════════════════════════════════════════════════════════ -->
+<div id="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>🦶 Dashboard Foot Care — Mercado Total Privado</h1>
+      <div class="sub">GP+OTC Genomma Lab · Canal Data · Genomma Canal Data</div>
+    </div>
+    <div class="header-right" style="display:flex;align-items:center;gap:18px">
+      <div>
+        <div id="hdr-date">—</div>
+        <div id="hdr-rows" style="opacity:.65"></div>
+      </div>
+      <label style="cursor:pointer;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);
+        color:white;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap"
+        for="file-input-hdr">↺ Cambiar archivo</label>
+      <input type="file" id="file-input-hdr" accept=".csv" style="display:none">
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Métrica</div>
+      <div class="pill-group">
+        <button class="pill on" id="pUni"   onclick="setMetric('Uni')">Unidades</button>
+        <button class="pill"    id="pPesos" onclick="setMetric('Pesos')">Pesos $MXN</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Período</div>
+      <div class="pill-group">
+        <button class="pill on" id="pMAT" onclick="setPeriod('MAT')">MAT</button>
+        <button class="pill"    id="pYTD" onclick="setPeriod('YTD')">YTD</button>
+        <button class="pill"    id="pMQT" onclick="setPeriod('MQT')">MQT</button>
+        <button class="pill"    id="pMTH" onclick="setPeriod('MTH')">Mensual</button>
+      </div>
+    </div>
+    <div class="ctrl-group" id="month-group">
+      <div class="ctrl-lbl">Mes</div>
+      <select class="sel" id="month-sel" onchange="setMonth(this.value)"></select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Canal</div>
+      <select class="sel" id="canal-sel" onchange="applyFilter('canal', this.value)">
+        <option value="Todos">Todos los canales</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Corporación</div>
+      <select class="sel" id="seg-sel" onchange="applyFilter('segmento', this.value)">
+        <option value="Todos">Todas las corporaciones</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-lbl">Agrupar GLI</div>
+      <div class="pill-group">
+        <button class="pill" id="pGLI" onclick="toggleGLI()"
+          title="Agrupa Silka + Unesia + Lakesia como TOTAL GLI">TOTAL GLI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 Share Charts: orden de general a específico -->
+  <div class="section">
+    <div class="grid-2x2">
+      <div class="card">
+        <div class="card-title">Share por Corporación</div>
+        <div class="card-sub" id="sub3">—</div>
+        <div class="chart-wrap"><canvas id="cSeg"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Canal / Mercado</div>
+        <div class="card-sub" id="sub0">—</div>
+        <div class="chart-wrap"><canvas id="cCanal"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Marca</div>
+        <div class="card-sub" id="sub1">—</div>
+        <div class="chart-wrap"><canvas id="cMarca"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Share por Forma Farmacéutica</div>
+        <div class="card-sub" id="sub2">—</div>
+        <div class="chart-wrap"><canvas id="cForma"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="card mb18">
+      <div class="trend-header">
+        <div>
+          <div class="card-title">Evolución Mensual — Top Marcas</div>
+          <div class="card-sub" id="trend-sub">Tendencia — carga la base maestra para ver la evolución mensual</div>
+        </div>
+        <select class="sel" id="topn-sel" onchange="renderTrend()" style="min-width:140px">
+          <option value="5">Top 5 marcas</option>
+          <option value="8">Top 8 marcas</option>
+          <option value="10">Top 10 marcas</option>
+        </select>
+      </div>
+      <div class="chart-wrap-tall"><canvas id="cTrend"></canvas></div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card mb32">
+      <div class="tbl-header">
+        <div>
+          <div class="card-title">Tabla Comparativa de Mercado</div>
+          <div class="card-sub">Período actual vs. año anterior · Share y variación</div>
+        </div>
+        <div class="dim-pills">
+          <button class="dim-pill on"  onclick="setTblDim('Producto',this)">Producto</button>
+          <button class="dim-pill"     onclick="setTblDim('Presentacion',this)">Presentación</button>
+          <button class="dim-pill"     onclick="setTblDim('Canal',this)">Canal</button>
+          <button class="dim-pill"     onclick="setTblDim('Forma Farmaceutica3',this)">Forma Farm.</button>
+          <button class="dim-pill"     onclick="setTblDim('Corporacion',this)">Corporación</button>
+        </div>
+      </div>
+      <div id="tbl-wrap" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- Portfolio Comparison -->
+    <div class="card mb32">
+      <div class="tbl-header">
+        <div>
+          <div class="card-title">Comparativo de Portafolio · GLI (Silka + Unesia + Lakesia) vs Ting · por Presentación</div>
+          <div class="card-sub" id="portfolio-sub">Detalle por presentación · período actual vs año anterior</div>
+        </div>
+        <div class="dim-pills" id="port-forma-pills">
+          <button class="dim-pill on"  onclick="setPortForma('Todos',this)">Todas las formas</button>
+          <button class="dim-pill"     onclick="setPortForma('Crema / Gel / Ungüento',this)">Crema / Gel / Ungüento</button>
+          <button class="dim-pill"     onclick="setPortForma('Spray / Aerosol',this)">Spray / Aerosol</button>
+          <button class="dim-pill"     onclick="setPortForma('Polvo / PVO Dermat',this)">Talco / Polvo</button>
+        </div>
+      </div>
+      <div class="portfolio-grid">
+        <!-- Columna GLI: 3 marcas apiladas -->
+        <div class="portfolio-gli-col">
+          <div>
+            <div class="portfolio-brand-hdr silka">Silka</div>
+            <div id="portfolio-silka" style="overflow-x:auto"></div>
+          </div>
+          <div>
+            <div class="portfolio-brand-hdr unesia">Unesia</div>
+            <div id="portfolio-unesia" style="overflow-x:auto"></div>
+          </div>
+          <div>
+            <div class="portfolio-brand-hdr lakesia">Lakesia</div>
+            <div id="portfolio-lakesia" style="overflow-x:auto"></div>
+          </div>
+        </div>
+        <!-- Columna Ting -->
+        <div class="portfolio-ting-col">
+          <div class="portfolio-brand-hdr ting">Ting</div>
+          <div id="portfolio-ting" style="overflow-x:auto"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section -->
+</div><!-- /dashboard -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+// PALETTE & CONSTANTS
+// ══════════════════════════════════════════════════════════
+const PAL = [
+  '#1565C0','#DC2626','#EA580C','#16A34A','#7C3AED',
+  '#0891B2','#B45309','#BE185D','#065F46','#1D4ED8',
+  '#9A3412','#6D28D9','#0F766E','#BE123C','#4338CA',
+  '#15803D','#92400E','#1E40AF','#7E22CE','#0E7490',
+];
+
+// Fallback estático (solo si el CSV no tiene columnas MTH detectables)
+const ALL_MONTHS = [
+  'Feb. 24','Mar. 24','Abr. 24','May. 24','Jun. 24','Jul. 24',
+  'Ago. 24','Sep. 24','Oct. 24','Nov. 24','Dic. 24',
+  'Ene. 25','Feb. 25','Mar. 25','Abr. 25','May. 25','Jun. 25',
+  'Jul. 25','Ago. 25','Sep. 25','Oct. 25','Nov. 25','Dic. 25','Ene. 26','Feb. 26'
+];
+let CSV_MONTHS = []; // se puebla desde los encabezados del CSV al cargar
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let DATA = [], HEADS = [];
+let PERIOD_AC = 'Ene. 26', PERIOD_YA = 'Ene. 25'; // se detectan automáticamente al cargar el CSV
+const ST = {
+  metric:   'Uni',
+  period:   'MAT',
+  month:    '',  // se actualiza automáticamente al cargar el CSV
+  canal:    'Todos',
+  segmento: 'Todos',
+  tblDim:    'Producto',  // dimensión para tabla comparativa
+  gli:       false,       // agrupa Silka + Unesia + Lakesia como TOTAL GLI
+  portForma: 'Todos',    // filtro de forma farmacéutica en portafolio
+};
+
+// ══════════════════════════════════════════════════════════
+// TOTAL GLI — agrupación de marcas Genomma Foot Care
+// ══════════════════════════════════════════════════════════
+const BRAND_DIM  = 'Producto'; // columna usada para gráficas de marca
+
+// normalizeMarca agrupa SILKA-MEDIC, UNESIA, LAKESIA como "TOTAL GLI"
+// detecta por nombre de Producto (la consulta Canal Data no tiene Marca Principal)
+function normalizeMarca(k) {
+  if (ST.gli && /SILKA|UNESIA|LAKESIA/i.test(k || '')) return 'TOTAL GLI';
+  return k;
+}
+
+// normalizeForma agrupa formas farmacéuticas similares
+function normalizeForma(k) {
+  if (!k) return k;
+  if (/crema|gel|ung[uü]ento/i.test(k))  return 'Crema / Gel / Ungüento';
+  if (/pvo|polvo/i.test(k))               return 'Polvo / PVO Dermat';
+  if (/spray|aerosol/i.test(k))           return 'Spray / Aerosol';
+  return k;
+}
+function toggleGLI() {
+  ST.gli = !ST.gli;
+  document.getElementById('pGLI').classList.toggle('on', ST.gli);
+  renderAll();
+}
+const CHARTS = {};
+
+// ══════════════════════════════════════════════════════════
+// AUTO-DETECCIÓN DE PERÍODOS DESDE EL CSV
+// ══════════════════════════════════════════════════════════
+const MES_ORD = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function sortPeriod(a, b) {
+  // Ordena periodos tipo "Ene. 26", "Feb. 26" por año y luego por mes
+  const [mA, yA] = [a.slice(0,3), parseInt(a.slice(-2))];
+  const [mB, yB] = [b.slice(0,3), parseInt(b.slice(-2))];
+  return yA !== yB ? yA - yB : MES_ORD.indexOf(mA) - MES_ORD.indexOf(mB);
+}
+
+function detectPeriods() {
+  // Busca columnas tipo "MAT Uni. Ene. 26" y extrae los períodos AC y YA
+  const prefix = 'MAT Uni. ';
+  const matPeriods = HEADS
+    .filter(h => h.startsWith(prefix))
+    .map(h => h.slice(prefix.length))   // "Ene. 26", "Feb. 26", etc.
+    .sort(sortPeriod);
+
+  if (matPeriods.length >= 2) {
+    PERIOD_YA = matPeriods[matPeriods.length - 2];  // penúltimo = año anterior
+    PERIOD_AC = matPeriods[matPeriods.length - 1];  // último = período actual
+  }
+
+  // Construir lista dinámica de meses desde las columnas MTH del CSV
+  const mthPrefix = 'MTH Uni. ';
+  const mthPeriods = HEADS
+    .filter(h => h.startsWith(mthPrefix))
+    .map(h => h.slice(mthPrefix.length))
+    .sort(sortPeriod);
+  if (mthPeriods.length > 0) {
+    CSV_MONTHS = mthPeriods;
+    ST.month = mthPeriods[mthPeriods.length - 1]; // último mes disponible
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// CSV PARSING
+// ══════════════════════════════════════════════════════════
+function parseRow(line) {
+  const r = []; let f = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { q = !q; }
+    else if (c === ',' && !q) { r.push(f); f = ''; }
+    else { f += c; }
+  }
+  r.push(f);
+  return r;
+}
+
+function num(v) {
+  if (!v) return 0;
+  const n = parseFloat(String(v).replace(/,/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function loadFile(file) {
+  const rd = new FileReader();
+  rd.onerror = () => alert('No se pudo leer el archivo. Verifica que sea un .csv válido.');
+  rd.onload = e => {
+    try {
+      const lines = e.target.result.split(/\r?\n/);
+      // Auto-detectar fila de encabezados (primera celda = 'Canal')
+      let headerIdx = 7;
+      for (let i = 0; i < Math.min(lines.length, 15); i++) {
+        if (lines[i].trim().startsWith('Canal,')) { headerIdx = i; break; }
+      }
+      HEADS = parseRow(lines[headerIdx]).map(h => h.trim());
+      detectPeriods(); // detecta PERIOD_AC, PERIOD_YA y el mes más reciente desde el CSV
+      DATA = [];
+      for (let i = headerIdx + 1; i < lines.length; i++) {
+        const l = lines[i].trim();
+        if (!l) continue;
+        const cols = parseRow(l);
+        const row = {};
+        HEADS.forEach((h, j) => { row[h] = (cols[j] || '').trim(); });
+        DATA.push(row);
+      }
+      // Excluir filas de totales/resumen (ej. "Total Conformado")
+      DATA = DATA.filter(r => r['Canal'] && !/total/i.test(r['Canal']));
+      // Filtrar mercado Foot Care: Clase Terapeutica Nivel4 = D01A1 ANTIFUNG DERMAT TOPICOS
+      const claseCol = HEADS.find(h => /clase.*ter/i.test(h) || /terapeutica/i.test(h));
+      if (claseCol) DATA = DATA.filter(r => (r[claseCol] || '').includes('D01A1'));
+      if (DATA.length === 0) { alert('El archivo no contiene registros de Foot Care (D01A1 ANTIFUNG DERMAT TOPICOS).\n\nVerifica que sea la consulta Canal Data de antifúngicos dermatológicos.'); return; }
+
+      // ── Diagnóstico de carga ──────────────────────────────
+      console.group('📊 Dashboard Foot Care — diagnóstico de carga');
+      console.log('Clase Terapéutica Foot Care detectada:', claseCol);
+      console.log('Registros Foot Care cargados:', DATA.length);
+      console.log('Período AC detectado:', PERIOD_AC, '| YA:', PERIOD_YA);
+      console.log('Columna AC (MAT Uni):', 'MAT Uni. ' + PERIOD_AC);
+      const totalMAT_Uni   = DATA.reduce((s,r) => s + num(r['MAT Uni. '   + PERIOD_AC]), 0);
+      const totalMAT_Pesos = DATA.reduce((s,r) => s + num(r['MAT Pesos '  + PERIOD_AC]), 0);
+      console.log('TOTAL MERCADO MAT Uni.:', totalMAT_Uni.toLocaleString('es-MX'));
+      console.log('TOTAL MERCADO MAT Pesos $:', totalMAT_Pesos.toLocaleString('es-MX', {style:'currency', currency:'MXN'}));
+      const marcas = [...new Set(DATA.map(r => r['Producto']))].filter(Boolean).sort();
+      console.log('Productos Foot Care detectados (' + marcas.length + '):', marcas);
+      console.log('Meses MTH disponibles:', CSV_MONTHS);
+      console.groupEnd();
+      // ─────────────────────────────────────────────────────
+      // Resetear estado de filtros al cargar nuevo archivo
+      ST.canal     = 'Todos';
+      ST.segmento  = 'Todos';
+      ST.gli       = false;
+      ST.portForma = 'Todos';
+      document.getElementById('pGLI').classList.remove('on');
+      document.querySelectorAll('#port-forma-pills .dim-pill').forEach((b,i) => b.classList.toggle('on', i===0));
+
+      // Limpiar y re-poblar selects
+      const cSel = document.getElementById('canal-sel');
+      const sSel = document.getElementById('seg-sel');
+      while (cSel.options.length > 1) cSel.remove(1);
+      while (sSel.options.length > 1) sSel.remove(1);
+      cSel.value = 'Todos';
+      sSel.value = 'Todos';
+      document.getElementById('month-sel').innerHTML = '';
+      initFilters();
+      initMonths();
+      document.getElementById('upload-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      // Mostrar período detectado dinámicamente
+      const perDisplay = PERIOD_AC.replace(/(\d{2})$/, '20$1'); // "Ene. 26" → "Ene. 2026"
+      document.getElementById('hdr-date').textContent = 'Última actualización: ' + perDisplay;
+      document.getElementById('hdr-rows').textContent = DATA.length.toLocaleString('es-MX') + ' registros Foot Care';
+      renderAll();
+    } catch(err) {
+      alert('Error al procesar el archivo: ' + err.message + '\n\nVerifica que sea la base maestra generada por Canal Data.');
+    }
+  };
+  rd.readAsText(file, 'windows-1252');
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function metricToken(m) {
+  // Uni tiene punto en el CSV: "MAT Uni. Ene. 26"
+  // Pesos NO tiene punto:      "MAT Pesos Ene. 26"
+  return m === 'Uni' ? 'Uni.' : 'Pesos';
+}
+function colAC() {
+  const mt = metricToken(ST.metric);
+  if (ST.period === 'MTH') return 'MTH ' + mt + ' ' + ST.month;
+  return ST.period + ' ' + mt + ' ' + PERIOD_AC; // usa período detectado del CSV
+}
+function colYA() {
+  const mt = metricToken(ST.metric);
+  if (ST.period === 'MTH') {
+    const mo = ST.month.slice(0, -2);   // "Feb. " (conserva espacio antes del año)
+    const yr = parseInt(ST.month.slice(-2)) - 1;
+    return 'MTH ' + mt + ' ' + mo + String(yr).padStart(2,'0');
+  }
+  return ST.period + ' ' + mt + ' ' + PERIOD_YA; // usa período YA detectado del CSV
+}
+function colMTH(metric, month) {
+  return 'MTH ' + metricToken(metric) + ' ' + month;
+}
+
+function filtered() {
+  return DATA.filter(r =>
+    (ST.canal    === 'Todos' || r['Canal']       === ST.canal) &&
+    (ST.segmento === 'Todos' || r['Corporacion'] === ST.segmento)
+  );
+}
+
+function agg(data, dim) {
+  const ac = {}, ya = {};
+  const cAC = colAC(), cYA = colYA();
+  data.forEach(r => {
+    let k = r[dim];
+    if (!k) return;
+    if (dim === BRAND_DIM)          k = normalizeMarca(k);
+    if (dim === 'Forma Farmaceutica3') k = normalizeForma(k);
+    ac[k] = (ac[k] || 0) + num(r[cAC]);
+    ya[k] = (ya[k] || 0) + num(r[cYA]);
+  });
+  const sorted = Object.entries(ac)
+    .filter(([,v]) => v > 0)
+    .sort((a,b) => b[1] - a[1]);
+  const grand   = sorted.reduce((s,[,v]) => s+v, 0);
+  const grandYA = Object.values(ya).reduce((s,v) => s+v, 0);
+  return { ac, ya, sorted, grand, grandYA };
+}
+
+function grouped(sorted, grand, thresh = 0.012) {
+  const main = []; let other = 0;
+  sorted.forEach(([k,v]) => {
+    if (v / grand >= thresh) main.push([k,v]);
+    else other += v;
+  });
+  if (other > 0) main.push(['Otros', other]);
+  return main;
+}
+
+function fmt(n, metric) {
+  if (metric === 'Pesos') {
+    if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+    return '$' + n.toFixed(0);
+  }
+  if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n.toFixed(0);
+}
+
+function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(1) + '%'; }
+function pp(n)  { return (n >= 0 ? '+' : '') + n.toFixed(1) + ' pp'; }
+
+function periodLabel() {
+  if (ST.period === 'MTH') return 'MTH ' + ST.month;
+  const full = PERIOD_AC.replace(/(\d{2})$/, '20$1'); // "Ene. 26" → "Ene. 2026"
+  return ST.period + ' ' + full;
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT FILTERS
+// ══════════════════════════════════════════════════════════
+function initFilters() {
+  const canales = [...new Set(DATA.map(r => r['Canal']).filter(Boolean))].sort();
+  const corps   = [...new Set(DATA.map(r => r['Corporacion']).filter(Boolean))].sort();
+  const cSel = document.getElementById('canal-sel');
+  const sSel = document.getElementById('seg-sel');
+  canales.forEach(c => cSel.add(new Option(c, c)));
+  corps.forEach(s => sSel.add(new Option(s, s)));
+}
+
+function initMonths() {
+  const sel = document.getElementById('month-sel');
+  // Construir lista de meses directamente desde los encabezados del CSV
+  const mthPrefix = 'MTH Uni. ';
+  const csvMonths = HEADS
+    .filter(h => h.startsWith(mthPrefix))
+    .map(h => h.slice(mthPrefix.length))
+    .sort(sortPeriod);
+  const months = csvMonths.length > 0 ? csvMonths : ALL_MONTHS;
+  months.forEach(m => sel.add(new Option(m, m)));
+  sel.value = ST.month; // apunta al último mes detectado en detectPeriods()
+}
+
+// ══════════════════════════════════════════════════════════
+// CONTROLS
+// ══════════════════════════════════════════════════════════
+function setMetric(m) {
+  ST.metric = m;
+  document.getElementById('pUni').classList.toggle('on', m === 'Uni');
+  document.getElementById('pPesos').classList.toggle('on', m === 'Pesos');
+  renderAll();
+}
+
+function setPeriod(p) {
+  ST.period = p;
+  ['MAT','YTD','MQT','MTH'].forEach(x =>
+    document.getElementById('p'+x).classList.toggle('on', x === p));
+  document.getElementById('month-group').style.display = p === 'MTH' ? 'flex' : 'none';
+  renderAll();
+}
+
+function setMonth(m) { ST.month = m; renderAll(); }
+
+function applyFilter(type, val) {
+  ST[type] = val;
+  renderAll();
+}
+
+function setPortForma(val, btn) {
+  ST.portForma = val;
+  document.querySelectorAll('#port-forma-pills .dim-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPortfolio();
+}
+
+function setTblDim(dim, btn) {
+  ST.tblDim = dim;
+  document.querySelectorAll('.dim-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// KPI CARDS
+// ══════════════════════════════════════════════════════════
+function renderKPIs() {
+  const d = filtered();
+  const cAC = colAC(), cYA = colYA();
+  const tot    = d.reduce((s,r) => s + num(r[cAC]), 0);
+  const totYA  = d.reduce((s,r) => s + num(r[cYA]), 0);
+  const growth = totYA > 0 ? (tot / totYA - 1) * 100 : 0;
+
+  const { sorted, grand } = agg(d, BRAND_DIM);
+  const topBrand = sorted[0]?.[0] ?? '—';
+  const topSh    = grand > 0 && sorted[0] ? (sorted[0][1] / grand * 100) : 0;
+  const nBrands  = sorted.length;
+
+  // GLI vs Ting (siempre calcula sin importar ST.gli)
+  const gliRows  = d.filter(r => /SILKA|UNESIA|LAKESIA/i.test(r['Producto'] || ''));
+  const tingRows = d.filter(r => /^TING/i.test(r['Producto'] || ''));
+  const gliAC  = gliRows.reduce((s,r)  => s + num(r[cAC]), 0);
+  const gliYA  = gliRows.reduce((s,r)  => s + num(r[cYA]), 0);
+  const tingAC = tingRows.reduce((s,r) => s + num(r[cAC]), 0);
+  const tingYA = tingRows.reduce((s,r) => s + num(r[cYA]), 0);
+  const gliSh  = tot > 0 ? gliAC  / tot * 100 : 0;
+  const tingSh = tot > 0 ? tingAC / tot * 100 : 0;
+  const gliGr  = gliYA  > 0 ? (gliAC  / gliYA  - 1) * 100 : 0;
+  const tingGr = tingYA > 0 ? (tingAC / tingYA - 1) * 100 : 0;
+  const delta  = gliSh - tingSh;
+
+  const kpis = [
+    { lbl: 'Tamaño Mercado · ' + periodLabel(),
+      val: fmt(tot, ST.metric), sub: ST.metric === 'Uni' ? 'Unidades' : 'Pesos MXN',
+      cls: '', subCls: '' },
+    { lbl: 'Año Anterior',
+      val: fmt(totYA, ST.metric), sub: ST.metric === 'Uni' ? 'Unidades' : 'Pesos MXN',
+      cls: '', subCls: '' },
+    { lbl: 'Crecimiento vs YA',
+      val: pct(growth),
+      sub: fmt(Math.abs(tot - totYA), ST.metric) + ' de diferencia',
+      cls: growth >= 0 ? 'green' : 'red',
+      subCls: growth >= 0 ? 'pos' : 'neg' },
+    { lbl: 'Marca Líder · ' + periodLabel(),
+      val: topBrand,
+      sub: topSh.toFixed(1) + '% share · ' + nBrands + ' marcas activas',
+      cls: 'orange', subCls: '' },
+  ];
+
+  const gliCard = `
+    <div class="kpi-card gli">
+      <div class="kpi-lbl">TOTAL GLI vs TING · ${periodLabel()}</div>
+      <div class="gli-row">
+        <div>
+          <div class="gli-brand-lbl gli-color">TOTAL GLI</div>
+          <div class="gli-val">${fmt(gliAC, ST.metric)}</div>
+          <div class="gli-sub ${gliGr >= 0 ? 'pos' : 'neg'}">${pct(gliGr)} · ${gliSh.toFixed(1)}% sh</div>
+        </div>
+        <div class="gli-vs">vs</div>
+        <div>
+          <div class="gli-brand-lbl ting-color">Ting</div>
+          <div class="gli-val">${fmt(tingAC, ST.metric)}</div>
+          <div class="gli-sub ${tingGr >= 0 ? 'pos' : 'neg'}">${pct(tingGr)} · ${tingSh.toFixed(1)}% sh</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#64748B;border-top:1px solid #F1F5F9;padding-top:6px;margin-top:2px">
+        Ventaja GLI: <span style="font-weight:800;color:${delta >= 0 ? '#7C3AED' : '#DC2626'}">${delta >= 0 ? '+' : ''}${delta.toFixed(1)} pp</span>
+      </div>
+    </div>`;
+
+  document.getElementById('kpi-row').innerHTML =
+    kpis.map(k => `
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-lbl">${k.lbl}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-sub ${k.subCls}">${k.sub}</div>
+    </div>`).join('') + gliCard;
+}
+
+// ══════════════════════════════════════════════════════════
+// DONUT CHARTS
+// ══════════════════════════════════════════════════════════
+function renderDonut(canvasId, subId, dim) {
+  const d = filtered();
+  const { sorted, grand } = agg(d, dim);
+  const grp    = grouped(sorted, grand);
+  const labels = grp.map(([k]) => k);
+  const vals   = grp.map(([,v]) => v);
+  const total  = vals.reduce((s,v) => s+v, 0);
+  const colors = labels.map((_,i) => PAL[i % PAL.length]);
+
+  document.getElementById(subId).textContent =
+    periodLabel() + ' · ' + (ST.metric === 'Uni' ? 'Unidades' : 'Valores') +
+    ' · Total: ' + fmt(total, ST.metric);
+
+  if (CHARTS[canvasId]) CHARTS[canvasId].destroy();
+
+  CHARTS[canvasId] = new Chart(
+    document.getElementById(canvasId).getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: vals, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            font: { size: 11 }, padding: 10, boxWidth: 13,
+            generateLabels: ch => {
+              const ds = ch.data.datasets[0];
+              return ch.data.labels.map((lbl, i) => ({
+                text: lbl + '  ' + (total > 0 ? (ds.data[i]/total*100).toFixed(1) : '0.0') + '%',
+                fillStyle: ds.backgroundColor[i],
+                strokeStyle: ds.backgroundColor[i],
+                lineWidth: 0, index: i, hidden: false,
+              }));
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const p = total > 0 ? (ctx.raw/total*100).toFixed(1) : '0.0';
+              return '  ' + ctx.label + ': ' + fmt(ctx.raw, ST.metric) + ' (' + p + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// TREND CHART
+// ══════════════════════════════════════════════════════════
+function renderTrend() {
+  const d    = filtered();
+  const topN = parseInt(document.getElementById('topn-sel').value);
+  const { sorted } = agg(d, BRAND_DIM);
+  const topKeys = sorted.slice(0, topN).map(([k]) => k);
+
+  // Usar meses del CSV; si no están disponibles aún, usar el fallback estático
+  const months = CSV_MONTHS.length > 0 ? CSV_MONTHS : ALL_MONTHS;
+
+  // Actualizar subtítulo con el rango real de meses del archivo cargado
+  const trendSub = document.getElementById('trend-sub');
+  if (trendSub && months.length > 0) {
+    const toFull = m => m.replace(/(\d{2})$/, '20$1');
+    trendSub.textContent =
+      'Tendencia ' + toFull(months[0]) + ' → ' + toFull(months[months.length - 1]) +
+      ' · ' + months.length + ' meses disponibles';
+  }
+
+  const monthly = {};
+  topKeys.forEach(k => monthly[k] = new Array(months.length).fill(0));
+  d.forEach(r => {
+    const rawK = r[BRAND_DIM];
+    if (!rawK) return;
+    const k = normalizeMarca(rawK);
+    if (!topKeys.includes(k)) return;
+    months.forEach((mo, i) => {
+      monthly[k][i] += num(r[colMTH(ST.metric, mo)]);
+    });
+  });
+
+  if (CHARTS['trend']) CHARTS['trend'].destroy();
+
+  CHARTS['trend'] = new Chart(
+    document.getElementById('cTrend').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: topKeys.map((brand, i) => ({
+        label: brand,
+        data: monthly[brand],
+        borderColor: PAL[i % PAL.length],
+        backgroundColor: PAL[i % PAL.length] + '18',
+        borderWidth: 2.5, pointRadius: 2.5, pointHoverRadius: 6,
+        tension: 0.35, fill: false,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { font:{size:11}, padding:14, usePointStyle:true } },
+        tooltip: {
+          callbacks: { label: ctx => '  ' + ctx.dataset.label + ': ' + fmt(ctx.raw, ST.metric) }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#F1F5F9' }, ticks: { font:{size:10}, maxRotation:45 } },
+        y: {
+          grid: { color: '#F1F5F9' },
+          ticks: { font:{size:11}, callback: v => fmt(v, ST.metric) }
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// DATA TABLE
+// ══════════════════════════════════════════════════════════
+function renderTable() {
+  const d = filtered();
+  const { ac, ya, sorted, grand, grandYA } = agg(d, ST.tblDim);
+  const mLbl = ST.metric === 'Uni' ? 'Uni' : '$MXN';
+  const pShort = ST.period === 'MTH' ? 'MTH ' + ST.month.slice(0,3) : ST.period;
+
+  let html = `
+    <table class="data-table">
+      <thead><tr>
+        <th>${
+          ST.tblDim === 'Producto'           ? 'Producto' :
+          ST.tblDim === 'Presentacion'       ? 'Presentación' :
+          ST.tblDim === 'Forma Farmaceutica3'? 'Forma Farm.' :
+          ST.tblDim
+        }</th>
+        <th>${pShort} AC<br><small>${mLbl}</small></th>
+        <th>${pShort} YA<br><small>${mLbl}</small></th>
+        <th>Var %</th>
+        <th>Share AC</th>
+        <th>Share YA</th>
+        <th>Δ pp</th>
+      </tr></thead>
+      <tbody>`;
+
+  sorted.forEach(([lbl, vAC]) => {
+    const vYA   = ya[lbl] || 0;
+    const varP  = vYA > 0 ? (vAC/vYA - 1)*100 : (vAC > 0 ? 100 : 0);
+    const shAC  = grand  > 0 ? vAC/grand*100   : 0;
+    const shYA  = grandYA > 0 ? vYA/grandYA*100 : 0;
+    const delta = shAC - shYA;
+    const w     = Math.max(2, Math.round(shAC * 2));
+
+    html += `<tr>
+      <td>
+        <div class="bar-cell">
+          <span>${lbl}</span>
+          <div class="mini-bar" style="width:${w}px">
+            <div class="mini-bar-fill" style="width:100%"></div>
+          </div>
+        </div>
+      </td>
+      <td>${fmt(vAC, ST.metric)}</td>
+      <td>${fmt(vYA, ST.metric)}</td>
+      <td class="${varP >= 0 ? 'pos' : 'neg'}">${pct(varP)}</td>
+      <td><strong>${shAC.toFixed(1)}%</strong></td>
+      <td>${shYA.toFixed(1)}%</td>
+      <td class="${delta >= 0 ? 'pos' : 'neg'}">${pp(delta)}</td>
+    </tr>`;
+  });
+
+  const totalVar = grandYA > 0 ? (grand/grandYA - 1)*100 : 0;
+  html += `</tbody>
+    <tfoot><tr>
+      <td>TOTAL MERCADO</td>
+      <td>${fmt(grand, ST.metric)}</td>
+      <td>${fmt(grandYA, ST.metric)}</td>
+      <td class="${totalVar >= 0 ? 'pos' : 'neg'}">${pct(totalVar)}</td>
+      <td><strong>100.0%</strong></td>
+      <td>100.0%</td>
+      <td>—</td>
+    </tr></tfoot>
+    </table>`;
+
+  document.getElementById('tbl-wrap').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// PORTFOLIO COMPARISON · GLI (Silka + Unesia + Lakesia) vs Ting
+// ══════════════════════════════════════════════════════════
+function renderPortfolio() {
+  // El portafolio solo respeta el filtro de Canal (Silka y Ting son marcas de Pies)
+  // Ignora el filtro de Corporación para mostrar siempre el portafolio completo de GLI vs Ting
+  const dPortfolio = DATA.filter(r =>
+    (ST.canal     === 'Todos' || r['Canal'] === ST.canal) &&
+    (ST.portForma === 'Todos' || normalizeForma(r['Forma Farmaceutica3']) === ST.portForma)
+  );
+  const cAC = colAC(), cYA = colYA();
+  const mLbl   = ST.metric === 'Uni' ? 'Uni' : '$MXN';
+  const pShort = ST.period === 'MTH' ? 'MTH ' + ST.month.slice(0,3) : ST.period;
+
+  function brandTable(brand, pattern) {
+    const rows = dPortfolio.filter(r => pattern.test(r['Producto'] || ''));
+    const ac = {}, ya = {};
+    rows.forEach(r => {
+      const k = r['Presentacion'];
+      if (!k) return;
+      ac[k] = (ac[k] || 0) + num(r[cAC]);
+      ya[k] = (ya[k] || 0) + num(r[cYA]);
+    });
+    const sorted = Object.entries(ac).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+    const grand   = sorted.reduce((s,[,v]) => s+v, 0);
+    const grandYA = Object.values(ya).reduce((s,v) => s+v, 0);
+
+    if (sorted.length === 0)
+      return '<p style="color:#94A3B8;font-size:13px;padding:12px 0">Sin datos para el período y filtros seleccionados</p>';
+
+    let html = `<table class="data-table">
+      <thead><tr>
+        <th>Presentación</th>
+        <th>${pShort} AC<br><small>${mLbl}</small></th>
+        <th>${pShort} YA<br><small>${mLbl}</small></th>
+        <th>Var %</th>
+        <th>Share</th>
+      </tr></thead><tbody>`;
+
+    sorted.forEach(([lbl, vAC]) => {
+      const vYA  = ya[lbl] || 0;
+      const varP = vYA > 0 ? (vAC/vYA - 1)*100 : (vAC > 0 ? 100 : 0);
+      const sh   = grand > 0 ? vAC/grand*100 : 0;
+      const w    = Math.max(2, Math.round(sh * 1.5));
+      html += `<tr>
+        <td style="max-width:220px;white-space:normal;line-height:1.35;font-size:12px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span>${lbl}</span>
+            <div class="mini-bar" style="width:${w}px"><div class="mini-bar-fill" style="width:100%"></div></div>
+          </div>
+        </td>
+        <td>${fmt(vAC, ST.metric)}</td>
+        <td>${fmt(vYA, ST.metric)}</td>
+        <td class="${varP >= 0 ? 'pos' : 'neg'}">${pct(varP)}</td>
+        <td><strong>${sh.toFixed(1)}%</strong></td>
+      </tr>`;
+    });
+
+    const varT = grandYA > 0 ? (grand/grandYA - 1)*100 : 0;
+    html += `</tbody><tfoot><tr>
+      <td>TOTAL ${brand.toUpperCase()}</td>
+      <td>${fmt(grand, ST.metric)}</td>
+      <td>${fmt(grandYA, ST.metric)}</td>
+      <td class="${varT >= 0 ? 'pos' : 'neg'}">${pct(varT)}</td>
+      <td><strong>100%</strong></td>
+    </tr></tfoot></table>`;
+    return html;
+  }
+
+  document.getElementById('portfolio-silka').innerHTML   = brandTable('Silka',   /SILKA/i);
+  document.getElementById('portfolio-unesia').innerHTML  = brandTable('Unesia',  /UNESIA/i);
+  document.getElementById('portfolio-lakesia').innerHTML = brandTable('Lakesia', /LAKESIA/i);
+  document.getElementById('portfolio-ting').innerHTML    = brandTable('Ting',    /^TING/i);
+  const canalLabel = ST.canal === 'Todos' ? 'todos los canales' : ST.canal;
+  document.getElementById('portfolio-sub').textContent =
+    periodLabel() + ' · ' + (ST.metric === 'Uni' ? 'Unidades' : 'Valores') +
+    ' · por presentación · ' + canalLabel;
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════
+function renderAll() {
+  renderKPIs();
+  renderDonut('cCanal', 'sub0', 'Canal');
+  renderDonut('cMarca', 'sub1', BRAND_DIM);
+  renderDonut('cForma', 'sub2', 'Forma Farmaceutica3');
+  renderDonut('cSeg',   'sub3', 'Corporacion');
+  renderTrend();
+  renderTable();
+  renderPortfolio();
+}
+
+// ══════════════════════════════════════════════════════════
+// FILE INPUT EVENTS
+// ══════════════════════════════════════════════════════════
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+document.getElementById('file-input-hdr').addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
+</script>
+</body>
+</html>
